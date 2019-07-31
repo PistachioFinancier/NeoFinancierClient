@@ -1,7 +1,7 @@
 import React from "react";
 import "antd/dist/antd.css";
 import { Row, Col, Input, Form, Modal, Button } from "antd";
-import amortSched from "../Scripts/Amort";
+import { amortSchedCA } from "../Scripts/Amort";
 
 class InterestDifferential extends React.Component {
   state = {
@@ -80,14 +80,14 @@ class InterestDifferential extends React.Component {
 
     //const result = fields["loanAmount"] * (0.01 * fields["interestRate1"]);
 
-    const amort1 = amortSched(
+    const amort1 = amortSchedCA(
       fields["loanAmount"],
       fields["interestRate1"],
       fields["term"] * 12,
       fields["amortization"] * 12
     );
 
-    const amort2 = amortSched(
+    const amort2 = amortSchedCA(
       fields["loanAmount"],
       fields["interestRate2"],
       fields["term"] * 12,
@@ -99,14 +99,14 @@ class InterestDifferential extends React.Component {
         amort2[amort2.length - 1]["accrued Interest"]
     );
 
-    const amort1Full = amortSched(
+    const amort1Full = amortSchedCA(
       fields["loanAmount"],
       fields["interestRate1"],
       fields["amortization"] * 12,
       fields["amortization"] * 12
     );
 
-    const amort2Full = amortSched(
+    const amort2Full = amortSchedCA(
       fields["loanAmount"],
       fields["interestRate2"],
       fields["amortization"] * 12,

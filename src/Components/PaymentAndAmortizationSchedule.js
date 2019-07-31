@@ -1,8 +1,8 @@
 import React from "react";
 import "antd/dist/antd.css";
 import { Row, Col, Input, Form, Modal, Button } from "antd";
-import amortSched from "../Scripts/Amort";
-import amortSchedUS from "../Scripts/AmortUS";
+import { amortSchedCA, discountedSavingsCA } from "../Scripts/Amort";
+import { amortSchedUS, discountedSavingsUS } from "../Scripts/AmortUS";
 
 class PaymentAndAmortizationSchedule extends React.Component {
   state = {
@@ -42,15 +42,13 @@ class PaymentAndAmortizationSchedule extends React.Component {
     });
   };
 
-  handleField = async (fieldName, event) => {
+  handleField = (fieldName, event) => {
     const newState = {
       ...this.state,
       fields: { ...this.state.fields, [fieldName]: event.target.value }
     };
 
-    await this.setState(newState);
-
-    this.getAmort();
+    this.setState(newState, () => this.getAmort());
   };
 
   getAmort = () => {
@@ -72,7 +70,7 @@ class PaymentAndAmortizationSchedule extends React.Component {
     }
 
     if (!this.state.fields.useUSSystem) {
-      var amort = amortSched(
+      var amort = amortSchedCA(
         fields["loanAmount"],
         fields["interestRate"],
         fields["term"] * 12,

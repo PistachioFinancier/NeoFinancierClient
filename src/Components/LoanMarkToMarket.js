@@ -1,9 +1,28 @@
 import React from "react";
 import "antd/dist/antd.css";
 import { Row, Col, Input, Form, Modal, Button } from "antd";
+import { DatePicker } from "antd";
 
 class LoanMarkToMarket extends React.Component {
-  state = { visible: false };
+  state = {
+    visible: false,
+    fields: {
+      markToMarketDate: null,
+      existingLoanAmount: null,
+      existingTerm: null,
+      existingAmortization: null,
+      existingInterestRate: null,
+      existingFirstPaymentDate: null,
+      newLoanAmount: null,
+      newAmortization: null,
+      newInterestRate: null,
+      newAdditionalRefinanceFee: null,
+
+      newUsedBalance: null,
+      newUsedTerm: null,
+      netAdjustmentToPrice: null
+    }
+  };
 
   showModal = () => {
     this.setState({
@@ -38,9 +57,10 @@ class LoanMarkToMarket extends React.Component {
           onCancel={this.handleCancel}
           width="1000px"
           height="800px"
+          footer=""
         >
-          <Row>
-            <Row>
+          <Form>
+            <Row gutter={16}>
               <p>
                 The Loan Mark to Market Pricing Adjustment Calculator is used to
                 determine the discount or premium to the price of an asset that
@@ -48,16 +68,17 @@ class LoanMarkToMarket extends React.Component {
                 what terms the asset would achieve if it were refinanced.
               </p>
             </Row>
-            <Row>
+            <Row gutter={16}>
               <Col span={12}>
                 Mark to Market Date
-                <Input></Input>
+                <br />
+                <DatePicker />
               </Col>
             </Row>
             <Row>
               <b>Existing Loan Information</b>
             </Row>
-            <Row>
+            <Row gutter={16}>
               <Col span={8}>
                 Loan Amount($)
                 <Input></Input>
@@ -71,20 +92,21 @@ class LoanMarkToMarket extends React.Component {
                 <Input></Input>
               </Col>
             </Row>
-            <Row>
+            <Row gutter={16}>
               <Col span={12}>
                 Interest Rate (%)
                 <Input></Input>
               </Col>
               <Col span={12}>
                 First Payment Date
-                <Input></Input>
+                <br />
+                <DatePicker />
               </Col>
             </Row>
-            <Row>
+            <Row gutter={16}>
               <b>New Loan Information</b>
             </Row>
-            <Row>
+            <Row gutter={16}>
               <Col span={12}>
                 Loan Amount
                 <Input></Input>
@@ -94,7 +116,7 @@ class LoanMarkToMarket extends React.Component {
                 <Col span={8}>Used Term</Col>
               </Col>
             </Row>
-            <Row>
+            <Row gutter={16}>
               <Col span={8}>
                 Amortization (year)
                 <Input></Input>
@@ -108,16 +130,16 @@ class LoanMarkToMarket extends React.Component {
                 <Input></Input>
               </Col>
             </Row>
-            <Row>
+            <Row gutter={16}>
               <b>Net Adjustment to Price* = </b>
             </Row>
-            <Row>
+            <Row gutter={16}>
               <p>
                 * = Interest Savings (Current Loan Interest Payments Remaining
                 less New Loan Interest Payments) less New Loan Fees
               </p>
             </Row>
-          </Row>
+          </Form>
         </Modal>
       </div>
     );
