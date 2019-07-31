@@ -17,12 +17,12 @@ const amortSchedUS = (amount, rate, term, amortization) => {
     principalLeft = principalLeft - principal;
     accInterest += interest;
     sched[i] = {
-      "payment number": i + 1,
-      interest: interest.toFixed(2),
-      principal: principal.toFixed(2),
-      monthlyPayment: monthlyPayment.toFixed(2),
-      "principal remaining": principalLeft.toFixed(2),
-      "accrued Interest": accInterest.toFixed(2)
+      "payment number": Number(i + 1),
+      interest: Number(interest.toFixed(2)),
+      principal: Number(principal.toFixed(2)),
+      monthlyPayment: Number(monthlyPayment.toFixed(2)),
+      "principal remaining": Number(principalLeft.toFixed(2)),
+      "accrued interest": Number(accInterest.toFixed(2))
     };
   }
 
