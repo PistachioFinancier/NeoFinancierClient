@@ -60,8 +60,6 @@ class ABLoanRate extends React.Component {
         }
       }
     );
-
-    // this.updateInterestRateDelta()
   };
 
   updateLoanToValue = () => {
@@ -247,17 +245,15 @@ class ABLoanRate extends React.Component {
               </Col>
             </Row>
             <Row>
-              <h3>
-                Combined Loan Amount ($) = {this.state.combinedLoanAmount}
-              </h3>
+              <h3>Combined Loan Amount = $ {this.state.combinedLoanAmount}</h3>
             </Row>
             <Row>
               <h3>
-                Combined Loan Interest (%) = {this.state.combinedLoanInterest}
+                Combined Loan Interest = {this.state.combinedLoanInterest} %
               </h3>
             </Row>
             <Row>
-              <h3>Combined Loan LTV (%) = {this.state.combinedLoanLTV}</h3>
+              <h3>Combined Loan LTV = {this.state.combinedLoanLTV} %</h3>
             </Row>
           </Form>
         </Modal>
