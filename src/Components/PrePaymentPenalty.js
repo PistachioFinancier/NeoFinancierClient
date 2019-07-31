@@ -51,7 +51,7 @@ class PrePaymentPenalty extends React.Component {
               Check for US Banking Systems
             </Row>
             <Row>
-              <Col span="8">
+              <Col span={8}>
                 Valuation Date
                 <Input v-model="value"></Input>
               </Col>
@@ -60,35 +60,35 @@ class PrePaymentPenalty extends React.Component {
               <b>Existing Loan Information</b>
             </Row>
             <Row>
-              <Col span="16">
+              <Col span={16}>
                 Loan Amount ($)
                 <Input></Input>
               </Col>
-              <Col span="8">
+              <Col span={8}>
                 Term (year)
                 <Input></Input>
               </Col>
             </Row>
             <Row>
-              <Col span="8">
+              <Col span={8}>
                 Amortization (year)
                 <Input></Input>
               </Col>
-              <Col span="8">
+              <Col span={8}>
                 First Payment Date
                 <Input></Input>
               </Col>
-              <Col span="8">
+              <Col span={8}>
                 Interest Rate (%)
                 <Input></Input>
               </Col>
             </Row>
             <Row>
-              <Col span="12">
+              <Col span={12}>
                 Lender of Cost of Funds (%)
                 <Input></Input>
               </Col>
-              <Col span="12">
+              <Col span={12}>
                 Minimum Pre-Payment Penalty ($)
                 <Input></Input>
               </Col>

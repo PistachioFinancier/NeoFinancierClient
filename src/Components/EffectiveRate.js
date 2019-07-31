@@ -48,24 +48,24 @@ class EffectiveRate extends React.Component {
                 comparison.
               </p>
             </Row>
-            <Col span="12">
+            <Col span={12}>
               <Row>
                 <b>Loan Information</b>
               </Row>
               <Row>
-                <Col span="6">
+                <Col span={6}>
                   Loan Amount ($)
                   <Input></Input>
                 </Col>
-                <Col span="6">
+                <Col span={6}>
                   Interest Rate (%)
                   <Input></Input>
                 </Col>
-                <Col span="6">
+                <Col span={6}>
                   Term (year)
                   <Input></Input>
                 </Col>
-                <Col span="6">
+                <Col span={6}>
                   Amortization (year)
                   <Input></Input>
                 </Col>
@@ -74,18 +74,18 @@ class EffectiveRate extends React.Component {
                 <b>Additional Costs:</b>
               </Row>
               <Row>
-                <Col span="8">
+                <Col span={8}>
                   Lender Fee/Cost
                   <Input></Input>
                 </Col>
-                <Col span="4">
+                <Col span={4}>
                   bps / $<Input></Input>
                 </Col>
-                <Col span="8">
+                <Col span={8}>
                   Broker Fee/Cost
                   <Input></Input>
                 </Col>
-                <Col span="4">
+                <Col span={4}>
                   bps / $<Input></Input>
                 </Col>
               </Row>
@@ -93,29 +93,29 @@ class EffectiveRate extends React.Component {
                 <b>Other Fees:</b>
               </Row>
               <Row>
-                <Col span="6">
+                <Col span={6}>
                   Appraisal ($)
                   <Input></Input>
                 </Col>
-                <Col span="6">
+                <Col span={6}>
                   ESA ($)
                   <Input></Input>
                 </Col>
-                <Col span="6">
+                <Col span={6}>
                   BCA ($)
                   <Input></Input>
                 </Col>
-                <Col span="6">
+                <Col span={6}>
                   Legal ($)
                   <Input></Input>
                 </Col>
               </Row>
               <Row>
-                <Col span="16">
+                <Col span={16}>
                   Management Time/Opportunity Cost ($)
                   <Input></Input>
                 </Col>
-                <Col span="8">
+                <Col span={8}>
                   Other ($)
                   <Input></Input>
                 </Col>
@@ -124,7 +124,7 @@ class EffectiveRate extends React.Component {
                 <b>Present Value of Costs</b>
               </Row>
               <Row>
-                <Col span="6">
+                <Col span={6}>
                   Discount Rate (%)
                   <Input></Input>
                 </Col>
@@ -139,24 +139,24 @@ class EffectiveRate extends React.Component {
               </Row>
             </Col>
 
-            <Col span="12">
+            <Col span={12}>
               <Row>
                 <b>Loan Information</b>
               </Row>
               <Row>
-                <Col span="6">
+                <Col span={6}>
                   Loan Amount ($)
                   <Input></Input>
                 </Col>
-                <Col span="6">
+                <Col span={6}>
                   Interest Rate (%)
                   <Input></Input>
                 </Col>
-                <Col span="6">
+                <Col span={6}>
                   Term (year)
                   <Input></Input>
                 </Col>
-                <Col span="6">
+                <Col span={6}>
                   Amortization (year)
                   <Input></Input>
                 </Col>
@@ -165,18 +165,18 @@ class EffectiveRate extends React.Component {
                 <b>Additional Costs:</b>
               </Row>
               <Row>
-                <Col span="8">
+                <Col span={8}>
                   Lender Fee/Cost
                   <Input></Input>
                 </Col>
-                <Col span="4">
+                <Col span={4}>
                   bps / $<Input></Input>
                 </Col>
-                <Col span="8">
+                <Col span={8}>
                   Broker Fee/Cost
                   <Input></Input>
                 </Col>
-                <Col span="4">
+                <Col span={4}>
                   bps / $<Input></Input>
                 </Col>
               </Row>
@@ -184,29 +184,29 @@ class EffectiveRate extends React.Component {
                 <b>Other Fees:</b>
               </Row>
               <Row>
-                <Col span="6">
+                <Col span={6}>
                   Appraisal ($)
                   <Input></Input>
                 </Col>
-                <Col span="6">
+                <Col span={6}>
                   ESA ($)
                   <Input></Input>
                 </Col>
-                <Col span="6">
+                <Col span={6}>
                   BCA ($)
                   <Input></Input>
                 </Col>
-                <Col span="6">
+                <Col span={6}>
                   Legal ($)
                   <Input></Input>
                 </Col>
               </Row>
               <Row>
-                <Col span="16">
+                <Col span={16}>
                   Management Time/Opportunity Cost ($)
                   <Input></Input>
                 </Col>
-                <Col span="8">
+                <Col span={8}>
                   Other ($)
                   <Input></Input>
                 </Col>
@@ -215,7 +215,7 @@ class EffectiveRate extends React.Component {
                 <b>Present Value of Costs</b>
               </Row>
               <Row>
-                <Col span="6">
+                <Col span={6}>
                   Discount Rate (%)
                   <Input></Input>
                 </Col>

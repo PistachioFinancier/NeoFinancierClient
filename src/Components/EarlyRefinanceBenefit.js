@@ -79,7 +79,7 @@ class EarlyRefinanceBenefit extends React.Component {
         >
           <Form>
             <Row>
-              <input type="checkbox">Check for US Banking Systems</input>
+              {/* <input type="checkbox">Check for US Banking Systems</input> */}
             </Row>
             <Col span={11}>
               <Row>
@@ -132,16 +132,7 @@ class EarlyRefinanceBenefit extends React.Component {
                 <Input />
               </Row>
               <Row>What do you want to calculate?</Row>
-              <Row>
-                <input type="radio" name="type">
-                  {" "}
-                  Final Benefit
-                </input>
-                <input type="radio" name="type">
-                  {" "}
-                  Final Savings
-                </input>
-              </Row>
+              <Row></Row>
             </Col>
 
             <Col span={13}>
@@ -182,17 +173,15 @@ class EarlyRefinanceBenefit extends React.Component {
                 <Row>Select entry type</Row>
                 <Row>
                   <Dropdown>
-                    <a>
+                    {/* <a>
                       Select type
                       <Icon type="down" />
-                    </a>
+                    </a> */}
                     <Menu slot="overlay">
                       <Menu.Item>
-                        <a>LTV (loan to value %)</a>
+                        {/* <a>LTV (loan to value %)</a> */}
                       </Menu.Item>
-                      <Menu.Item>
-                        <a>Loan Amount</a>
-                      </Menu.Item>
+                      <Menu.Item>{/* <a>Loan Amount</a> */}</Menu.Item>
                     </Menu>
                   </Dropdown>
                 </Row>
