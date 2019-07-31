@@ -1,4 +1,4 @@
-const amortSched = (amount, rate, term, amortization) => {
+const amortSchedUS = (amount, rate, term, amortization) => {
   let sched = [];
 
   const J = rate / 12 / 100;
@@ -29,6 +29,34 @@ const amortSched = (amount, rate, term, amortization) => {
   return sched;
 };
 
-// amortSched(1000000, 5, 60, 300);
+const discountedSavingsUS = (
+  amount,
+  rate1,
+  rate2,
+  term,
+  amortization,
+  discount
+) => {
+  const loan1 = amortSchedUS(amount, rate1, term, amortization);
+  const loan2 = amortSchedUS(amount, rate2, term, amortization);
+  let sum = 0;
 
-export default amortSched;
+  if (discount === 0) {
+    return Math.abs(
+      parseFloat(loan1[term - 1].interest) -
+        parseFloat(loan2[term - 1].interest)
+    ).toFixed(2);
+  } else {
+    for (let payment = 0; payment < term; payment++) {
+      sum +=
+        Math.abs(
+          parseFloat(loan1[payment].interest) -
+            parseFloat(loan2[payment].interest)
+        ) /
+        (1 + discount / 1200) ** (payment + 1);
+    }
+  }
+  return sum.toFixed(2);
+};
+
+export { amortSchedUS, discountedSavingsUS };

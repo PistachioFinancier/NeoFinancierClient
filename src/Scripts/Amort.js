@@ -1,4 +1,4 @@
-const amortSched = (amount, rate, term, amortization) => {
+const amortSchedCA = (amount, rate, term, amortization) => {
   let sched = [];
   let monthlyPayment =
     Math.round(
@@ -27,4 +27,34 @@ const amortSched = (amount, rate, term, amortization) => {
   return sched;
 };
 
-export default amortSched;
+const discountedSavingsCA = (
+  amount,
+  rate1,
+  rate2,
+  term,
+  amortization,
+  discount
+) => {
+  const loan1 = amortSchedCA(amount, rate1, term, amortization);
+  const loan2 = amortSchedCA(amount, rate2, term, amortization);
+  let sum = 0;
+
+  if (discount === 0) {
+    return Math.abs(
+      parseFloat(loan1[term - 1].interest) -
+        parseFloat(loan2[term - 1].interest)
+    ).toFixed(2);
+  } else {
+    for (let payment = 0; payment < term; payment++) {
+      sum +=
+        Math.abs(
+          parseFloat(loan1[payment].interest) -
+            parseFloat(loan2[payment].interest)
+        ) /
+        (1 + discount / 1200) ** (payment + 1);
+    }
+  }
+  return sum.toFixed(2);
+};
+
+export { amortSchedCA, discountedSavingsCA };
