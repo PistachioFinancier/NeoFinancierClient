@@ -13,7 +13,7 @@ class LoanMarkToMarket extends React.Component {
       existingAmortization: null,
       existingInterestRate: null,
       existingFirstPaymentDate: null,
-      newLoanAmount: null,
+      newLoanAmountOption: null,
       newAmortization: null,
       newInterestRate: null,
       newAdditionalRefinanceFee: null,
@@ -42,6 +42,15 @@ class LoanMarkToMarket extends React.Component {
     this.setState({
       visible: false
     });
+  };
+
+  handleField = (fieldName, event) => {
+    const newState = {
+      ...this.state,
+      fields: { ...this.state.fields, [fieldName]: event.target.value }
+    };
+
+    this.setState(newState);
   };
 
   render() {
@@ -81,21 +90,27 @@ class LoanMarkToMarket extends React.Component {
             <Row gutter={16}>
               <Col span={8}>
                 Loan Amount($)
-                <Input></Input>
+                <Input
+                  onChange={e => this.handleField("existingLoanAmount", e)}
+                />
               </Col>
               <Col span={8}>
                 Term (year)
-                <Input></Input>
+                <Input onChange={e => this.handleField("existingTerm", e)} />
               </Col>
               <Col span={8}>
                 Amortization (year)
-                <Input></Input>
+                <Input
+                  onChange={e => this.handleField("existingAmortization", e)}
+                />
               </Col>
             </Row>
             <Row gutter={16}>
               <Col span={12}>
                 Interest Rate (%)
-                <Input></Input>
+                <Input
+                  onChange={e => this.handleField("existingInterestRate", e)}
+                />
               </Col>
               <Col span={12}>
                 First Payment Date
