@@ -30,11 +30,13 @@ function PrePaymentPenalty(props) {
       interest &&
       lenderCostOfFunds
     ) {
+      console.log("effect 2 ran");
       calculatePrePaymentPenalty();
     }
   });
 
   function calculatePrePaymentPenalty() {
+    console.log("calc function ran");
     const termsUpToDate = Math.round(
       (valuationDate - firstPaymentDate) / 2592000000
     );
@@ -43,49 +45,30 @@ function PrePaymentPenalty(props) {
       interestAtValuationDate,
       remainingPrincipleAtValuationDate;
 
-    if (!useUSSystem) {
-      interestAtAmmortization = amortSchedCA(
+    const populateVariables = func => {
+      interestAtAmmortization = func(
         loanAmount,
         interest,
         term * 12,
         amortization * 12
       ).slice(-1)[0]["accrued interest"];
 
-      interestAtValuationDate = amortSchedCA(
+      interestAtValuationDate = func(
         loanAmount,
         interest,
         term * 12,
         amortization * 12
       )[termsUpToDate - 1]["accrued interest"];
 
-      remainingPrincipleAtValuationDate = amortSchedCA(
+      remainingPrincipleAtValuationDate = func(
         loanAmount,
         interest,
         term * 12,
         amortization * 12
       )[termsUpToDate - 1]["principal remaining"];
-    } else {
-      interestAtAmmortization = amortSchedUS(
-        loanAmount,
-        interest,
-        term * 12,
-        amortization * 12
-      ).slice(-1)[0]["accrued interest"];
+    };
 
-      interestAtValuationDate = amortSchedUS(
-        loanAmount,
-        interest,
-        term * 12,
-        amortization * 12
-      )[termsUpToDate - 1]["accrued interest"];
-
-      remainingPrincipleAtValuationDate = amortSchedUS(
-        loanAmount,
-        interest,
-        term * 12,
-        amortization * 12
-      )[termsUpToDate - 1]["principal remaining"];
-    }
+    populateVariables(!useUSSystem ? amortSchedCA : amortSchedUS);
 
     const interestRemaining = interestAtAmmortization - interestAtValuationDate;
 
