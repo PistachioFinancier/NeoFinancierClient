@@ -20,6 +20,8 @@ function PrePaymentPenalty(props) {
 
   const { getFieldDecorator } = props.form;
 
+  // let prePaymentPenalty = 0;
+
   useEffect(() => {
     if (
       valuationDate &&
@@ -30,7 +32,6 @@ function PrePaymentPenalty(props) {
       interest &&
       lenderCostOfFunds
     ) {
-      console.log("effect 2 ran");
       calculatePrePaymentPenalty();
     }
   });
@@ -81,6 +82,7 @@ function PrePaymentPenalty(props) {
           100
       ) / 100;
 
+    // prePaymentPenalty = result + minimumPenalty;
     setPrePaymentPenalty(result + minimumPenalty);
   }
 
@@ -209,7 +211,9 @@ function PrePaymentPenalty(props) {
                   ]
                 })(
                   <Input
-                    onChange={e => setLenderCostOfFunds(Number(e.target.value))}
+                    onChange={e => {
+                      setLenderCostOfFunds(Number(e.target.value));
+                    }}
                   />
                 )}
               </Form.Item>
