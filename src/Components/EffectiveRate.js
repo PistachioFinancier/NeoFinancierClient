@@ -1,43 +1,48 @@
 import React, { useState, useEffect } from "react";
 import "antd/dist/antd.css";
 import { Row, Col, Input, Form, Modal, Button } from "antd";
-import { amortSchedCA } from "../Scripts/Amort";
+import { amortSchedCA, discountedCA } from "../Scripts/Amort";
 import { amortSchedUS } from "../Scripts/AmortUS";
 import { Select } from "antd";
+import EffectiveInterestCalculator from "effective-interest-rate";
 
 function EffectiveRate(props) {
   const [visible, setVisible] = useState(false);
   const [useUSSystem, setUseUSSystem] = useState(false);
-  const [firstLoanAmount, setFirstLoanAmount] = useState(10000);
-  const [firstInterest, setFirstInterest] = useState(10);
-  const [firstTerm, setFirstTerm] = useState(5);
-  const [firstAmortization, setFirstAmortization] = useState(25);
-  const [firstLenderFee, setFirstLenderFee] = useState();
-  const [firstLenderBPS, setFirstLenderBPS] = useState("$");
-  const [firstBrokerFee, setFirstBrokerFee] = useState();
-  const [firstBrokerBPS, setFirstBrokerBPS] = useState("$");
-  const [firstAppraisalCost, setFirstAppraisalCost] = useState();
-  const [firstESACost, setFirstESACost] = useState();
-  const [firstBCACost, setFirstBCACost] = useState();
-  const [firstLegalCost, setFirstLegalCost] = useState();
-  const [firstManagementCost, setFirstManagementCost] = useState();
-  const [firstOtherCost, setFirstOtherCost] = useState();
-  const [firstDiscountRate, setFirstDiscountRate] = useState();
-  const [secondLoanAmount, setSecondLoanAmount] = useState();
-  const [secondInterest, setSecondInterest] = useState();
-  const [secondTerm, setSecondTerm] = useState();
-  const [secondAmortization, setSecondAmortization] = useState();
-  const [secondLenderFee, setSecondLenderFee] = useState();
-  const [secondLenderBPS, setSecondLenderBPS] = useState("$");
-  const [secondBrokerFee, setSecondBrokerFee] = useState();
-  const [secondBrokerBPS, setSecondBrokerBPS] = useState("$");
-  const [secondAppraisalCost, setSecondAppraisalCost] = useState();
-  const [secondESACost, setSecondESACost] = useState();
-  const [secondBCACost, setSecondBCACost] = useState();
-  const [secondLegalCost, setSecondLegalCost] = useState();
-  const [secondManagementCost, setSecondManagementCost] = useState();
-  const [secondOtherCost, setSecondOtherCost] = useState();
-  const [secondDiscountRate, setSecondDiscountRate] = useState();
+  const [firstLoanAmount, setFirstLoanAmount] = useState(1000);
+  const [firstInterest, setFirstInterest] = useState(1);
+  const [firstTerm, setFirstTerm] = useState(12);
+  const [firstAmortization, setFirstAmortization] = useState(1);
+  const [firstLenderFee, setFirstLenderFee] = useState(0);
+  const [firstLenderFeeType, setFirstLenderFeeType] = useState("$");
+  const [firstBrokerFee, setFirstBrokerFee] = useState(0);
+  const [firstBrokerFeeType, setFirstBrokerFeeType] = useState("$");
+  const [firstAppraisalCost, setFirstAppraisalCost] = useState(0);
+  const [firstESACost, setFirstESACost] = useState(0);
+  const [firstBCACost, setFirstBCACost] = useState(0);
+  const [firstLegalCost, setFirstLegalCost] = useState(0);
+  const [firstManagementCost, setFirstManagementCost] = useState(0);
+  const [firstOtherCost, setFirstOtherCost] = useState(0);
+  const [firstDiscountRate, setFirstDiscountRate] = useState(0);
+  const [firstEffectiveRate, setFirstEffectiveRate] = useState();
+  const [firstPV, setFirstPV] = useState();
+  const [secondLoanAmount, setSecondLoanAmount] = useState(1000);
+  const [secondInterest, setSecondInterest] = useState(1);
+  const [secondTerm, setSecondTerm] = useState(12);
+  const [secondAmortization, setSecondAmortization] = useState(1);
+  const [secondLenderFee, setSecondLenderFee] = useState(0);
+  const [secondLenderFeeType, setSecondLenderFeeType] = useState("$");
+  const [secondBrokerFee, setSecondBrokerFee] = useState(0);
+  const [secondBrokerFeeType, setSecondBrokerFeeType] = useState("$");
+  const [secondAppraisalCost, setSecondAppraisalCost] = useState(0);
+  const [secondESACost, setSecondESACost] = useState(0);
+  const [secondBCACost, setSecondBCACost] = useState(0);
+  const [secondLegalCost, setSecondLegalCost] = useState(0);
+  const [secondManagementCost, setSecondManagementCost] = useState(0);
+  const [secondOtherCost, setSecondOtherCost] = useState(0);
+  const [secondDiscountRate, setSecondDiscountRate] = useState(0);
+  const [secondEffectiveRate, setSecondEffectiveRate] = useState();
+  const [secondPV, setSecondPV] = useState();
 
   const { getFieldDecorator } = props.form;
   const { Option } = Select;
@@ -47,30 +52,84 @@ function EffectiveRate(props) {
   });
 
   const calculateEffectiveInterestRate = () => {
-    const totalInterestPaidAtEndOfTerm = amortSchedCA(
+    const totalCosts1 =
+      (firstLenderFeeType == "$"
+        ? firstLenderFee
+        : (firstLenderFee * firstLoanAmount) / 100) +
+      (firstBrokerFeeType == "$"
+        ? firstBrokerFee
+        : (firstBrokerFee * firstLoanAmount) / 100) +
+      firstAppraisalCost +
+      firstESACost +
+      firstBCACost +
+      firstLegalCost +
+      firstManagementCost +
+      firstOtherCost;
+
+    const MP1 = amortSchedCA(
       firstLoanAmount,
       firstInterest,
       firstTerm * 12,
       firstAmortization * 12
-    ).slice(-1)[0]["accrued interest"];
+    )[0].monthlyPayment;
 
-    // const totalPrincipleRemainingAtEndOfTerm = amortSchedCA(
-    //   firstLoanAmount,
-    //   firstInterest,
-    //   firstTerm * 12,
-    //   firstAmortization * 12
-    // ).slice(-1)[0]["principal remaining"];
+    const preRate1 = EffectiveInterestCalculator.withEqualPayments(
+      firstLoanAmount - totalCosts1,
+      MP1,
+      firstAmortization * 12,
+      firstInterest / 100
+    );
 
-    // const totalPaidAtEndOfTerm =
-    //   firstLoanAmount * 2 -
-    //   totalPrincipleRemainingAtEndOfTerm +
-    //   totalInterestPaidAtEndOfTerm;
+    setFirstEffectiveRate(((1 + preRate1 / 2) ** 2 - 1) * 100);
+    setFirstPV(
+      discountedCA(
+        firstLoanAmount,
+        firstInterest,
+        firstTerm * 12,
+        firstAmortization * 12,
+        firstDiscountRate
+      ) + totalCosts1
+    );
 
-    const effectiveRate =
-      (1 + totalInterestPaidAtEndOfTerm / firstLoanAmount) ** (1 / firstTerm) -
-      1;
+    const totalCosts2 =
+      (secondLenderFeeType == "$"
+        ? secondLenderFee
+        : (secondLenderFee * secondLoanAmount) / 100) +
+      (secondBrokerFeeType == "$"
+        ? secondBrokerFee
+        : (secondBrokerFee * secondLoanAmount) / 100) +
+      secondAppraisalCost +
+      secondESACost +
+      secondBCACost +
+      secondLegalCost +
+      secondManagementCost +
+      secondOtherCost;
 
-    console.log(effectiveRate);
+    const MP2 = amortSchedCA(
+      secondLoanAmount,
+      secondInterest,
+      secondTerm * 12,
+      secondAmortization * 12
+    )[0].monthlyPayment;
+
+    const preRate2 = EffectiveInterestCalculator.withEqualPayments(
+      secondLoanAmount - totalCosts2,
+      MP2,
+      secondAmortization * 12,
+      secondInterest / 100
+    );
+
+    setSecondEffectiveRate(((1 + preRate2 / 2) ** 2 - 1) * 100);
+
+    setSecondPV(
+      discountedCA(
+        secondLoanAmount,
+        secondInterest,
+        secondTerm * 12,
+        secondAmortization * 12,
+        secondDiscountRate
+      ) + totalCosts2
+    );
   };
 
   return (
@@ -183,14 +242,19 @@ function EffectiveRate(props) {
                     ]
                   })(
                     <Input
-                      onChange={e => setFirstLenderFee(Number(e.target.value))}
+                      onChange={e => {
+                        setFirstLenderFee(Number(e.target.value));
+                      }}
                     />
                   )}
                 </Form.Item>
               </Col>
               <Col span={4}>
                 <Form.Item label="bps / $">
-                  <Select defaultValue="$" onChange={e => setFirstLenderBPS(e)}>
+                  <Select
+                    defaultValue="$"
+                    onChange={e => setFirstLenderFeeType(e)}
+                  >
                     <Option value="$">$</Option>
                     <Option value="%">%</Option>
                   </Select>
@@ -214,7 +278,10 @@ function EffectiveRate(props) {
               </Col>
               <Col span={4}>
                 <Form.Item label="bps / $">
-                  <Select defaultValue="$" onChange={e => setFirstBrokerBPS(e)}>
+                  <Select
+                    defaultValue="$"
+                    onChange={e => setFirstBrokerFeeType(e)}
+                  >
                     <Option value="$">$</Option>
                     <Option value="%">%</Option>
                   </Select>
@@ -338,7 +405,7 @@ function EffectiveRate(props) {
                     rules: [
                       {
                         pattern: "^\\d+(.\\d+)?$",
-                        message: "Loan Amount ($) must be a number."
+                        message: "Discount Rate (%) must be a number."
                       }
                     ]
                   })(
@@ -353,11 +420,12 @@ function EffectiveRate(props) {
             </Row>
             <Row>
               <b>
-                Effective Interest Rate Including Additional Costs (Annual) =
+                Effective Interest Rate Including Additional Costs (Annual) = %{" "}
+                {firstEffectiveRate ? firstEffectiveRate.toFixed(2) : ""}
               </b>
             </Row>
             <Row>
-              <b>Total PV of Costs =</b>
+              <b>Total PV of Costs = $ {firstPV ? firstPV.toFixed(2) : ""}</b>
             </Row>
           </Col>
 
@@ -459,7 +527,7 @@ function EffectiveRate(props) {
                 <Form.Item label="bps / $">
                   <Select
                     defaultValue="$"
-                    onChange={e => setSecondLenderBPS(e)}
+                    onChange={e => setSecondLenderFeeType(e)}
                   >
                     <Option value="$">$</Option>
                     <Option value="%">%</Option>
@@ -486,7 +554,7 @@ function EffectiveRate(props) {
                 <Form.Item label="bps / $">
                   <Select
                     defaultValue="$"
-                    onChange={e => setSecondBrokerBPS(e)}
+                    onChange={e => setSecondBrokerFeeType(e)}
                   >
                     <Option value="$">$</Option>
                     <Option value="%">%</Option>
@@ -626,11 +694,14 @@ function EffectiveRate(props) {
             </Row>
             <Row>
               <b>
-                Effective Interest Rate Including Additional Costs (Annual) =
+                Effective Interest Rate Including Additional Costs (Annual) = %
+                {secondEffectiveRate ? secondEffectiveRate.toFixed(2) : ""}
               </b>
             </Row>
             <Row>
-              <b>Total PV of Costs =</b>
+              <b>
+                Total PV of Costs = $ {secondPV ? secondPV.toFixed(2) : ""}{" "}
+              </b>
             </Row>
           </Col>
         </Form>

@@ -41,8 +41,8 @@ const discountedSavingsCA = (
 
   if (discount === 0) {
     return Math.abs(
-      parseFloat(loan1[term - 1].interest) -
-        parseFloat(loan2[term - 1].interest)
+      parseFloat(loan1[term - 1]["accrued interest"]) -
+        parseFloat(loan2[term - 1]["accrued interest"])
     ).toFixed(2);
   } else {
     for (let payment = 0; payment < term; payment++) {
@@ -57,4 +57,20 @@ const discountedSavingsCA = (
   return sum.toFixed(2);
 };
 
-export { amortSchedCA, discountedSavingsCA };
+const discountedCA = (amount, rate, term, amortization, discount) => {
+  const loan = amortSchedCA(amount, rate, term, amortization);
+  let sum = 0;
+
+  if (discount === 0) {
+    return parseFloat(loan[term - 1]["accrued interest"]);
+  } else {
+    for (let payment = 0; payment < term; payment++) {
+      sum +=
+        parseFloat(loan[payment].interest) /
+        (1 + discount / 1200) ** (payment + 1);
+    }
+  }
+  return sum;
+};
+
+export { amortSchedCA, discountedSavingsCA, discountedCA };

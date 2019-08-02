@@ -21,7 +21,7 @@ function EarlyRefinanceBenefit(props) {
 
   return (
     <div>
-      <Button type="primary" onClick={this.showModal}>
+      <Button type="primary" onClick={() => setVisible(true)}>
         Early Refinance Benefit Calculator
       </Button>
       <Modal
