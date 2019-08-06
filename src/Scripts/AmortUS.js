@@ -6,8 +6,6 @@ const amortSchedUS = (amount, rate, term, amortization) => {
   let monthlyPayment =
     Math.round(((amount * J) / (1 - (1 + J) ** -amortization)) * 100) / 100;
 
-  //   console.log("monthlyPayment", monthlyPayment);
-
   let monthlyInterest = rate / 12 / 100;
   let principalLeft = amount;
   let accInterest = 0;
@@ -22,7 +20,8 @@ const amortSchedUS = (amount, rate, term, amortization) => {
       principal: Number(principal.toFixed(2)),
       monthlyPayment: Number(monthlyPayment.toFixed(2)),
       "principal remaining": Number(principalLeft.toFixed(2)),
-      "accrued interest": Number(accInterest.toFixed(2))
+      "accrued interest": Number(accInterest.toFixed(2)),
+      "starting principal": Number((principalLeft + principal).toFixed(2))
     };
   }
 

@@ -36,7 +36,6 @@ function PrePaymentPenalty(props) {
   });
 
   function calculatePrePaymentPenalty() {
-    console.log("calc function ran");
     const termsUpToDate = Math.round(
       (valuationDate - firstPaymentDate) / 2592000000
     );
@@ -81,7 +80,6 @@ function PrePaymentPenalty(props) {
           100
       ) / 100;
 
-    // prePaymentPenalty = result + minimumPenalty;
     setPrePaymentPenalty(result + minimumPenalty);
   }
 
@@ -95,7 +93,7 @@ function PrePaymentPenalty(props) {
         visible={visible}
         width="600px"
         onCancel={() => setVisible(false)}
-        footer=""
+        footer={null}
       >
         <Form>
           <Row>
@@ -182,12 +180,7 @@ function PrePaymentPenalty(props) {
             <Col span={12}>
               <Form.Item label="Lender of Cost of Funds (%)">
                 {getFieldDecorator("lenderCostOfFunds", {
-                  rules: [
-                    {
-                      pattern: "^\\d+(.\\d+)?$",
-                      message: "Lender of Cost of Funds (%) must be a number."
-                    }
-                  ]
+                  rules: [validation.number, validation.percent]
                 })(
                   <Input
                     onChange={e => {
@@ -200,13 +193,7 @@ function PrePaymentPenalty(props) {
             <Col span={12}>
               <Form.Item label="Minimum Pre-Payment Penalty ($)">
                 {getFieldDecorator("minimumPenalty", {
-                  rules: [
-                    {
-                      pattern: "^\\d+(.\\d+)?$",
-                      message:
-                        "Minimum Pre-Payment Penalty ($) must be a number."
-                    }
-                  ]
+                  rules: [validation.number]
                 })(
                   <Input
                     onChange={e => setMinimumPenalty(Number(e.target.value))}

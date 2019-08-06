@@ -20,7 +20,8 @@ const amortSchedCA = (amount, rate, term, amortization) => {
       principal: Number(principal.toFixed(2)),
       monthlyPayment: Number(monthlyPayment.toFixed(2)),
       "principal remaining": Number(principalLeft.toFixed(2)),
-      "accrued interest": Number(accInterest.toFixed(2))
+      "accrued interest": Number(accInterest.toFixed(2)),
+      "starting principal": Number((principalLeft + principal).toFixed(2))
     };
   }
 
