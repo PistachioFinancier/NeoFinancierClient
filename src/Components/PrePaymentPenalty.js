@@ -4,6 +4,7 @@ import { Row, Col, Input, Form, Modal, Button, Checkbox } from "antd";
 import { DatePicker } from "antd";
 import { amortSchedCA } from "../Scripts/Amort";
 import { amortSchedUS } from "../Scripts/AmortUS";
+import validation from "../Scripts/validation";
 
 function PrePaymentPenalty(props) {
   const [visible, setVisible] = useState(false);
@@ -19,8 +20,6 @@ function PrePaymentPenalty(props) {
   const [prePaymentPenalty, setPrePaymentPenalty] = useState();
 
   const { getFieldDecorator } = props.form;
-
-  // let prePaymentPenalty = 0;
 
   useEffect(() => {
     if (
@@ -132,12 +131,7 @@ function PrePaymentPenalty(props) {
             <Col span={16}>
               <Form.Item label="Loan Amount ($)">
                 {getFieldDecorator("loanAmount", {
-                  rules: [
-                    {
-                      pattern: "^\\d+(.\\d+)?$",
-                      message: "Loan Amount ($) must be a number."
-                    }
-                  ]
+                  rules: [validation.number]
                 })(
                   <Input
                     onChange={e => setLoanAmount(Number(e.target.value))}
@@ -148,12 +142,7 @@ function PrePaymentPenalty(props) {
             <Col span={8}>
               <Form.Item label="Term (year)">
                 {getFieldDecorator("term", {
-                  rules: [
-                    {
-                      pattern: "^\\d+(.\\d+)?$",
-                      message: "Term (year) must be a number."
-                    }
-                  ]
+                  rules: [validation.number]
                 })(<Input onChange={e => setTerm(Number(e.target.value))} />)}
               </Form.Item>
             </Col>
@@ -162,12 +151,7 @@ function PrePaymentPenalty(props) {
             <Col span={8}>
               <Form.Item label="Amortization (year)">
                 {getFieldDecorator("amortization", {
-                  rules: [
-                    {
-                      pattern: "^\\d+(.\\d+)?$",
-                      message: "Amortization (year) must be a number."
-                    }
-                  ]
+                  rules: [validation.number]
                 })(
                   <Input
                     onChange={e => setAmortization(Number(e.target.value))}
@@ -187,12 +171,7 @@ function PrePaymentPenalty(props) {
             <Col span={8}>
               <Form.Item label="Interest Rate (%)">
                 {getFieldDecorator("interest", {
-                  rules: [
-                    {
-                      pattern: "^\\d+(.\\d+)?$",
-                      message: "Interest Rate (%) must be a number."
-                    }
-                  ]
+                  rules: [validation.number, validation.percent]
                 })(
                   <Input onChange={e => setInterest(Number(e.target.value))} />
                 )}

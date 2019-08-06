@@ -9,10 +9,10 @@ import EffectiveInterestCalculator from "effective-interest-rate";
 function EffectiveRate(props) {
   const [visible, setVisible] = useState(false);
   const [useUSSystem, setUseUSSystem] = useState(false);
-  const [firstLoanAmount, setFirstLoanAmount] = useState(1000);
-  const [firstInterest, setFirstInterest] = useState(1);
-  const [firstTerm, setFirstTerm] = useState(12);
-  const [firstAmortization, setFirstAmortization] = useState(1);
+  const [firstLoanAmount, setFirstLoanAmount] = useState();
+  const [firstInterest, setFirstInterest] = useState();
+  const [firstTerm, setFirstTerm] = useState();
+  const [firstAmortization, setFirstAmortization] = useState();
   const [firstLenderFee, setFirstLenderFee] = useState(0);
   const [firstLenderFeeType, setFirstLenderFeeType] = useState("$");
   const [firstBrokerFee, setFirstBrokerFee] = useState(0);
@@ -52,84 +52,97 @@ function EffectiveRate(props) {
   });
 
   const calculateEffectiveInterestRate = () => {
-    const totalCosts1 =
-      (firstLenderFeeType == "$"
-        ? firstLenderFee
-        : (firstLenderFee * firstLoanAmount) / 100) +
-      (firstBrokerFeeType == "$"
-        ? firstBrokerFee
-        : (firstBrokerFee * firstLoanAmount) / 100) +
-      firstAppraisalCost +
-      firstESACost +
-      firstBCACost +
-      firstLegalCost +
-      firstManagementCost +
-      firstOtherCost;
+    if (
+      firstLoanAmount &&
+      firstInterest &&
+      firstTerm &&
+      firstAmortization &&
+      firstDiscountRate &&
+      secondLoanAmount &&
+      secondInterest &&
+      secondTerm &&
+      secondAmortization &&
+      secondDiscountRate
+    ) {
+      const totalCosts1 =
+        (firstLenderFeeType === "$"
+          ? firstLenderFee
+          : (firstLenderFee * firstLoanAmount) / 100) +
+        (firstBrokerFeeType === "$"
+          ? firstBrokerFee
+          : (firstBrokerFee * firstLoanAmount) / 100) +
+        firstAppraisalCost +
+        firstESACost +
+        firstBCACost +
+        firstLegalCost +
+        firstManagementCost +
+        firstOtherCost;
 
-    const MP1 = amortSchedCA(
-      firstLoanAmount,
-      firstInterest,
-      firstTerm * 12,
-      firstAmortization * 12
-    )[0].monthlyPayment;
-
-    const preRate1 = EffectiveInterestCalculator.withEqualPayments(
-      firstLoanAmount - totalCosts1,
-      MP1,
-      firstAmortization * 12,
-      firstInterest / 100
-    );
-
-    setFirstEffectiveRate(((1 + preRate1 / 2) ** 2 - 1) * 100);
-    setFirstPV(
-      discountedCA(
+      const MP1 = amortSchedCA(
         firstLoanAmount,
         firstInterest,
         firstTerm * 12,
+        firstAmortization * 12
+      )[0].monthlyPayment;
+
+      const preRate1 = EffectiveInterestCalculator.withEqualPayments(
+        firstLoanAmount - totalCosts1,
+        MP1,
         firstAmortization * 12,
-        firstDiscountRate
-      ) + totalCosts1
-    );
+        firstInterest / 100
+      );
 
-    const totalCosts2 =
-      (secondLenderFeeType == "$"
-        ? secondLenderFee
-        : (secondLenderFee * secondLoanAmount) / 100) +
-      (secondBrokerFeeType == "$"
-        ? secondBrokerFee
-        : (secondBrokerFee * secondLoanAmount) / 100) +
-      secondAppraisalCost +
-      secondESACost +
-      secondBCACost +
-      secondLegalCost +
-      secondManagementCost +
-      secondOtherCost;
+      setFirstEffectiveRate(((1 + preRate1 / 2) ** 2 - 1) * 100);
+      setFirstPV(
+        discountedCA(
+          firstLoanAmount,
+          firstInterest,
+          firstTerm * 12,
+          firstAmortization * 12,
+          firstDiscountRate
+        ) + totalCosts1
+      );
 
-    const MP2 = amortSchedCA(
-      secondLoanAmount,
-      secondInterest,
-      secondTerm * 12,
-      secondAmortization * 12
-    )[0].monthlyPayment;
+      const totalCosts2 =
+        (secondLenderFeeType === "$"
+          ? secondLenderFee
+          : (secondLenderFee * secondLoanAmount) / 100) +
+        (secondBrokerFeeType === "$"
+          ? secondBrokerFee
+          : (secondBrokerFee * secondLoanAmount) / 100) +
+        secondAppraisalCost +
+        secondESACost +
+        secondBCACost +
+        secondLegalCost +
+        secondManagementCost +
+        secondOtherCost;
 
-    const preRate2 = EffectiveInterestCalculator.withEqualPayments(
-      secondLoanAmount - totalCosts2,
-      MP2,
-      secondAmortization * 12,
-      secondInterest / 100
-    );
-
-    setSecondEffectiveRate(((1 + preRate2 / 2) ** 2 - 1) * 100);
-
-    setSecondPV(
-      discountedCA(
+      const MP2 = amortSchedCA(
         secondLoanAmount,
         secondInterest,
         secondTerm * 12,
+        secondAmortization * 12
+      )[0].monthlyPayment;
+
+      const preRate2 = EffectiveInterestCalculator.withEqualPayments(
+        secondLoanAmount - totalCosts2,
+        MP2,
         secondAmortization * 12,
-        secondDiscountRate
-      ) + totalCosts2
-    );
+        secondInterest / 100
+      );
+
+      setSecondEffectiveRate(((1 + preRate2 / 2) ** 2 - 1) * 100);
+
+      setSecondPV(
+        discountedCA(
+          secondLoanAmount,
+          secondInterest,
+          secondTerm * 12,
+          secondAmortization * 12,
+          secondDiscountRate
+        ) + totalCosts2
+      );
+    }
   };
 
   return (
