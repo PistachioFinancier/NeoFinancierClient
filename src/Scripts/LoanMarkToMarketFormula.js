@@ -19,10 +19,17 @@ const loanMarkToMarket = (
 
   let usedBalance;
 
-  let numberOfMonths =
-    12 * Math.abs(market_Date.getYear() - start_Date.getYear()) +
-    Math.abs(market_Date.getMonth() - start_Date.getMonth()) +
-    (market_Date.getDay() >= start_Date.getDay() ? 1 : 0);
+  const numberOfMonths =
+    12 *
+      Math.abs(
+        market_Date.getFullYear() -
+          start_Date.getFullYear() -
+          (market_Date.getMonth() < start_Date.getMonth() ? 1 : 0)
+      ) +
+    ((market_Date.getMonth() - start_Date.getMonth() < 0
+      ? market_Date.getMonth() - start_Date.getMonth() + 12
+      : market_Date.getMonth() - start_Date.getMonth()) +
+      (market_Date.getDate() >= start_Date.getDate() ? 1 : 0));
 
   const amort = amortSchedCA(
     loanAmount,

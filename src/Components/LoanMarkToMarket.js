@@ -4,6 +4,7 @@ import { Row, Col, Input, Form, Modal, Button } from "antd";
 import { DatePicker } from "antd";
 import { Menu, Dropdown, Icon } from "antd";
 import loanMarkToMarket from "../Scripts/LoanMarkToMarketFormula";
+import validation from "../Scripts/validation";
 
 function LoanMarkToMarket(props) {
   const [visible, setVisible] = useState(false);
@@ -20,6 +21,8 @@ function LoanMarkToMarket(props) {
   const [usedBalance, setUsedBalance] = useState("N/A");
   const [usedTerm, setUsedTerm] = useState("N/A");
   const [netAdjustmentToPrice, setNetAdjustmentToPrice] = useState("N/A");
+
+  const { getFieldDecorator } = props.form;
 
   useEffect(() => calculateLoanMarkToMarket());
 
@@ -42,8 +45,6 @@ function LoanMarkToMarket(props) {
       !variables.includes(null) &&
       !variables.includes("")
     ) {
-      console.log("I am running");
-      console.log(variables);
       const result = loanMarkToMarket(...variables);
       setUsedBalance(result.usedBalance);
       setUsedTerm(result.usedTerm);
@@ -77,7 +78,7 @@ function LoanMarkToMarket(props) {
         onCancel={() => setVisible(false)}
         width="1000px"
         height="800px"
-        footer=""
+        footer={null}
       >
         <Form>
           <Row gutter={16}>
@@ -102,28 +103,56 @@ function LoanMarkToMarket(props) {
           </Row>
           <Row gutter={16}>
             <Col span={8}>
-              Loan Amount($)
-              <Input
-                onChange={e => setExistingLoanAmount(Number(e.target.value))}
-              />
+              <Form.Item label="Loan Amount($)">
+                {getFieldDecorator("existingLoanAmount", {
+                  rules: [validation.number]
+                })(
+                  <Input
+                    onChange={e =>
+                      setExistingLoanAmount(Number(e.target.value))
+                    }
+                  />
+                )}
+              </Form.Item>
             </Col>
             <Col span={8}>
-              Term (year)
-              <Input onChange={e => setExistingTerm(Number(e.target.value))} />
+              <Form.Item label="Term (year)">
+                {getFieldDecorator("existingTerm", {
+                  rules: [validation.number]
+                })(
+                  <Input
+                    onChange={e => setExistingTerm(Number(e.target.value))}
+                  />
+                )}
+              </Form.Item>
             </Col>
             <Col span={8}>
-              Amortization (year)
-              <Input
-                onChange={e => setExistingAmortization(Number(e.target.value))}
-              />
+              <Form.Item label="Amortization (year)">
+                {getFieldDecorator("existingAmortization", {
+                  rules: [validation.number]
+                })(
+                  <Input
+                    onChange={e =>
+                      setExistingAmortization(Number(e.target.value))
+                    }
+                  />
+                )}
+              </Form.Item>
             </Col>
           </Row>
           <Row gutter={16}>
             <Col span={12}>
-              Interest Rate (%)
-              <Input
-                onChange={e => setExistingInterestRate(Number(e.target.value))}
-              />
+              <Form.Item label="Interest Rate (%)">
+                {getFieldDecorator("existingInterestRate", {
+                  rules: [validation.number, validation.percent]
+                })(
+                  <Input
+                    onChange={e =>
+                      setExistingInterestRate(Number(e.target.value))
+                    }
+                  />
+                )}
+              </Form.Item>
             </Col>
             <Col span={12}>
               First Payment Date
@@ -166,24 +195,39 @@ function LoanMarkToMarket(props) {
           </Row>
           <Row gutter={16}>
             <Col span={8}>
-              Amortization (year)
-              <Input
-                onChange={e => setNewAmortization(Number(e.target.value))}
-              />
+              <Form.Item label="Amortization (year)">
+                {getFieldDecorator("newAmortization", {
+                  rules: [validation.number]
+                })(
+                  <Input
+                    onChange={e => setNewAmortization(Number(e.target.value))}
+                  />
+                )}
+              </Form.Item>
             </Col>
             <Col span={8}>
-              Interest Rate (%)
-              <Input
-                onChange={e => setNewInterestRate(Number(e.target.value))}
-              />
+              <Form.Item label="Interest Rate (%)">
+                {getFieldDecorator("newInterestRate", {
+                  rules: [validation.number]
+                })(
+                  <Input
+                    onChange={e => setNewInterestRate(Number(e.target.value))}
+                  />
+                )}
+              </Form.Item>
             </Col>
             <Col span={8}>
-              Additional Refinance Fees (%)
-              <Input
-                onChange={e =>
-                  setNewAdditionalRefinanceFee(Number(e.target.value))
-                }
-              />
+              <Form.Item label="Additional Refinance Fees (%)">
+                {getFieldDecorator("newAdditionalRefinanceFee", {
+                  rules: [validation.number, validation.percent]
+                })(
+                  <Input
+                    onChange={e =>
+                      setNewAdditionalRefinanceFee(Number(e.target.value))
+                    }
+                  />
+                )}
+              </Form.Item>
             </Col>
           </Row>
           <Row gutter={16}>

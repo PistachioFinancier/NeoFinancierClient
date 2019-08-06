@@ -36,10 +36,22 @@ function PrePaymentPenalty(props) {
   });
 
   function calculatePrePaymentPenalty() {
-    const termsUpToDate = Math.round(
-      (valuationDate - firstPaymentDate) / 2592000000
-    );
+    const market_Date = new Date(valuationDate);
+    const start_Date = new Date(firstPaymentDate);
 
+    const numberOfMonths =
+      12 *
+        Math.abs(
+          market_Date.getFullYear() -
+            start_Date.getFullYear() -
+            (market_Date.getMonth() < start_Date.getMonth() ? 1 : 0)
+        ) +
+      ((market_Date.getMonth() - start_Date.getMonth() < 0
+        ? market_Date.getMonth() - start_Date.getMonth() + 12
+        : market_Date.getMonth() - start_Date.getMonth()) +
+        (market_Date.getDate() >= start_Date.getDate() ? 1 : 0));
+
+    console.log(numberOfMonths);
     let interestAtAmmortization,
       interestAtValuationDate,
       remainingPrincipleAtValuationDate;
@@ -57,14 +69,14 @@ function PrePaymentPenalty(props) {
         interest,
         term * 12,
         amortization * 12
-      )[termsUpToDate - 1]["accrued interest"];
+      )[numberOfMonths - 1]["accrued interest"];
 
       remainingPrincipleAtValuationDate = func(
         loanAmount,
         interest,
         term * 12,
         amortization * 12
-      )[termsUpToDate - 1]["principal remaining"];
+      )[numberOfMonths - 1]["principal remaining"];
     };
 
     populateVariables(!useUSSystem ? amortSchedCA : amortSchedUS);
@@ -76,7 +88,7 @@ function PrePaymentPenalty(props) {
         (interestRemaining -
           ((remainingPrincipleAtValuationDate * lenderCostOfFunds * 0.01) /
             12) *
-            (term * 12 - termsUpToDate)) *
+            (term * 12 - numberOfMonths)) *
           100
       ) / 100;
 

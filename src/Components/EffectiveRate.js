@@ -5,6 +5,7 @@ import { amortSchedCA, discountedCA } from "../Scripts/Amort";
 import { amortSchedUS } from "../Scripts/AmortUS";
 import { Select } from "antd";
 import EffectiveInterestCalculator from "effective-interest-rate";
+import validation from "../Scripts/validation";
 
 function EffectiveRate(props) {
   const [visible, setVisible] = useState(false);
@@ -176,12 +177,7 @@ function EffectiveRate(props) {
               <Col span={6}>
                 <Form.Item label="Loan Amount ($)">
                   {getFieldDecorator("loanAmount", {
-                    rules: [
-                      {
-                        pattern: "^\\d+(.\\d+)?$",
-                        message: "Loan Amount ($) must be a number."
-                      }
-                    ]
+                    rules: [validation.number]
                   })(
                     <Input
                       onChange={e => setFirstLoanAmount(Number(e.target.value))}
@@ -192,12 +188,7 @@ function EffectiveRate(props) {
               <Col span={6}>
                 <Form.Item label="Interest Rate (%)">
                   {getFieldDecorator("firstInterest", {
-                    rules: [
-                      {
-                        pattern: "^\\d+(.\\d+)?$",
-                        message: "Loan Amount ($) must be a number."
-                      }
-                    ]
+                    rules: [validation.number, validation.percent]
                   })(
                     <Input
                       onChange={e => setFirstInterest(Number(e.target.value))}
@@ -208,12 +199,7 @@ function EffectiveRate(props) {
               <Col span={6}>
                 <Form.Item label="Term (year)">
                   {getFieldDecorator("firstTerm", {
-                    rules: [
-                      {
-                        pattern: "^\\d+(.\\d+)?$",
-                        message: "Loan Amount ($) must be a number."
-                      }
-                    ]
+                    rules: [validation.number]
                   })(
                     <Input
                       onChange={e => setFirstTerm(Number(e.target.value))}
@@ -224,12 +210,7 @@ function EffectiveRate(props) {
               <Col span={6}>
                 <Form.Item label="Amortization (year)">
                   {getFieldDecorator("firstAmortization", {
-                    rules: [
-                      {
-                        pattern: "^\\d+(.\\d+)?$",
-                        message: "Loan Amount ($) must be a number."
-                      }
-                    ]
+                    rules: [validation.number]
                   })(
                     <Input
                       onChange={e =>
@@ -247,12 +228,7 @@ function EffectiveRate(props) {
               <Col span={8}>
                 <Form.Item label="Lender Fee/Cost">
                   {getFieldDecorator("firstLenderFee", {
-                    rules: [
-                      {
-                        pattern: "^\\d+(.\\d+)?$",
-                        message: "Loan Amount ($) must be a number."
-                      }
-                    ]
+                    rules: [validation.number]
                   })(
                     <Input
                       onChange={e => {
@@ -276,12 +252,7 @@ function EffectiveRate(props) {
               <Col span={8}>
                 <Form.Item label="Broker Fee/Cost">
                   {getFieldDecorator("firstBrokerFee", {
-                    rules: [
-                      {
-                        pattern: "^\\d+(.\\d+)?$",
-                        message: "Loan Amount ($) must be a number."
-                      }
-                    ]
+                    rules: [validation.number]
                   })(
                     <Input
                       onChange={e => setFirstBrokerFee(Number(e.target.value))}
@@ -308,12 +279,7 @@ function EffectiveRate(props) {
               <Col span={6}>
                 <Form.Item label="Appraisal ($)">
                   {getFieldDecorator("firstAppraisalCost", {
-                    rules: [
-                      {
-                        pattern: "^\\d+(.\\d+)?$",
-                        message: "Loan Amount ($) must be a number."
-                      }
-                    ]
+                    rules: [validation.number]
                   })(
                     <Input
                       onChange={e =>
@@ -326,12 +292,7 @@ function EffectiveRate(props) {
               <Col span={6}>
                 <Form.Item label="ESA ($)">
                   {getFieldDecorator("firstESACost", {
-                    rules: [
-                      {
-                        pattern: "^\\d+(.\\d+)?$",
-                        message: "Loan Amount ($) must be a number."
-                      }
-                    ]
+                    rules: [validation.number]
                   })(
                     <Input
                       onChange={e => setFirstESACost(Number(e.target.value))}
@@ -342,12 +303,7 @@ function EffectiveRate(props) {
               <Col span={6}>
                 <Form.Item label="BCA ($)">
                   {getFieldDecorator("firstBCACost", {
-                    rules: [
-                      {
-                        pattern: "^\\d+(.\\d+)?$",
-                        message: "Loan Amount ($) must be a number."
-                      }
-                    ]
+                    rules: [validation.number]
                   })(
                     <Input
                       onChange={e => setFirstBCACost(Number(e.target.value))}
@@ -358,12 +314,7 @@ function EffectiveRate(props) {
               <Col span={6}>
                 <Form.Item label="Legal ($)">
                   {getFieldDecorator("firstLegalCost", {
-                    rules: [
-                      {
-                        pattern: "^\\d+(.\\d+)?$",
-                        message: "Loan Amount ($) must be a number."
-                      }
-                    ]
+                    rules: [validation.number]
                   })(
                     <Input
                       onChange={e => setFirstLegalCost(Number(e.target.value))}
@@ -376,12 +327,7 @@ function EffectiveRate(props) {
               <Col span={16}>
                 <Form.Item label="Management Time/Opportunity Cost ($)">
                   {getFieldDecorator("firstManagementCost", {
-                    rules: [
-                      {
-                        pattern: "^\\d+(.\\d+)?$",
-                        message: "Loan Amount ($) must be a number."
-                      }
-                    ]
+                    rules: [validation.number]
                   })(
                     <Input
                       onChange={e =>
@@ -394,12 +340,7 @@ function EffectiveRate(props) {
               <Col span={8}>
                 <Form.Item label="Other ($)">
                   {getFieldDecorator("firstOtherCost", {
-                    rules: [
-                      {
-                        pattern: "^\\d+(.\\d+)?$",
-                        message: "Loan Amount ($) must be a number."
-                      }
-                    ]
+                    rules: [validation.number]
                   })(
                     <Input
                       onChange={e => setFirstOtherCost(Number(e.target.value))}
@@ -415,12 +356,7 @@ function EffectiveRate(props) {
               <Col span={6}>
                 <Form.Item label="Discount Rate (%)">
                   {getFieldDecorator("firstDiscountRate", {
-                    rules: [
-                      {
-                        pattern: "^\\d+(.\\d+)?$",
-                        message: "Discount Rate (%) must be a number."
-                      }
-                    ]
+                    rules: [validation.number, validation.percent]
                   })(
                     <Input
                       onChange={e =>
@@ -450,12 +386,7 @@ function EffectiveRate(props) {
               <Col span={6}>
                 <Form.Item label="Loan Amount ($)">
                   {getFieldDecorator("secondLoanAmount", {
-                    rules: [
-                      {
-                        pattern: "^\\d+(.\\d+)?$",
-                        message: "Loan Amount ($) must be a number."
-                      }
-                    ]
+                    rules: [validation.number]
                   })(
                     <Input
                       onChange={e =>
@@ -468,12 +399,7 @@ function EffectiveRate(props) {
               <Col span={6}>
                 <Form.Item label="Interest Rate (%)">
                   {getFieldDecorator("secondInterest", {
-                    rules: [
-                      {
-                        pattern: "^\\d+(.\\d+)?$",
-                        message: "Loan Amount ($) must be a number."
-                      }
-                    ]
+                    rules: [validation.number, validation.percent]
                   })(
                     <Input
                       onChange={e => setSecondInterest(Number(e.target.value))}
@@ -484,12 +410,7 @@ function EffectiveRate(props) {
               <Col span={6}>
                 <Form.Item label="Term (year)">
                   {getFieldDecorator("secondTerm", {
-                    rules: [
-                      {
-                        pattern: "^\\d+(.\\d+)?$",
-                        message: "Loan Amount ($) must be a number."
-                      }
-                    ]
+                    rules: [validation.number]
                   })(
                     <Input
                       onChange={e => setSecondTerm(Number(e.target.value))}
@@ -500,12 +421,7 @@ function EffectiveRate(props) {
               <Col span={6}>
                 <Form.Item label="Amortization (year)">
                   {getFieldDecorator("secondAmortization", {
-                    rules: [
-                      {
-                        pattern: "^\\d+(.\\d+)?$",
-                        message: "Loan Amount ($) must be a number."
-                      }
-                    ]
+                    rules: [validation.number]
                   })(
                     <Input
                       onChange={e =>
@@ -523,12 +439,7 @@ function EffectiveRate(props) {
               <Col span={8}>
                 <Form.Item label="Lender Fee/Cost">
                   {getFieldDecorator("secondLenderFee", {
-                    rules: [
-                      {
-                        pattern: "^\\d+(.\\d+)?$",
-                        message: "Loan Amount ($) must be a number."
-                      }
-                    ]
+                    rules: [validation.number]
                   })(
                     <Input
                       onChange={e => setSecondLenderFee(Number(e.target.value))}
@@ -550,12 +461,7 @@ function EffectiveRate(props) {
               <Col span={8}>
                 <Form.Item label="Broker Fee/Cost">
                   {getFieldDecorator("secondBrokerFee", {
-                    rules: [
-                      {
-                        pattern: "^\\d+(.\\d+)?$",
-                        message: "Loan Amount ($) must be a number."
-                      }
-                    ]
+                    rules: [validation.number]
                   })(
                     <Input
                       onChange={e => setSecondBrokerFee(Number(e.target.value))}
@@ -582,12 +488,7 @@ function EffectiveRate(props) {
               <Col span={6}>
                 <Form.Item label="Appraisal ($)">
                   {getFieldDecorator("secondAppraisalCost", {
-                    rules: [
-                      {
-                        pattern: "^\\d+(.\\d+)?$",
-                        message: "Loan Amount ($) must be a number."
-                      }
-                    ]
+                    rules: [validation.number]
                   })(
                     <Input
                       onChange={e =>
@@ -600,12 +501,7 @@ function EffectiveRate(props) {
               <Col span={6}>
                 <Form.Item label="ESA ($)">
                   {getFieldDecorator("secondESACost", {
-                    rules: [
-                      {
-                        pattern: "^\\d+(.\\d+)?$",
-                        message: "Loan Amount ($) must be a number."
-                      }
-                    ]
+                    rules: [validation.number]
                   })(
                     <Input
                       onChange={e => setSecondESACost(Number(e.target.value))}
@@ -616,12 +512,7 @@ function EffectiveRate(props) {
               <Col span={6}>
                 <Form.Item label="BCA ($)">
                   {getFieldDecorator("secondBCACost", {
-                    rules: [
-                      {
-                        pattern: "^\\d+(.\\d+)?$",
-                        message: "Loan Amount ($) must be a number."
-                      }
-                    ]
+                    rules: [validation.number]
                   })(
                     <Input
                       onChange={e => setSecondBCACost(Number(e.target.value))}
@@ -632,12 +523,7 @@ function EffectiveRate(props) {
               <Col span={6}>
                 <Form.Item label="Legal ($)">
                   {getFieldDecorator("secondLegalCost", {
-                    rules: [
-                      {
-                        pattern: "^\\d+(.\\d+)?$",
-                        message: "Loan Amount ($) must be a number."
-                      }
-                    ]
+                    rules: [validation.number]
                   })(
                     <Input
                       onChange={e => setSecondLegalCost(Number(e.target.value))}
@@ -650,12 +536,7 @@ function EffectiveRate(props) {
               <Col span={16}>
                 <Form.Item label="Management Time/Opportunity Cost ($)">
                   {getFieldDecorator("secondManagementCost", {
-                    rules: [
-                      {
-                        pattern: "^\\d+(.\\d+)?$",
-                        message: "Loan Amount ($) must be a number."
-                      }
-                    ]
+                    rules: [validation.number]
                   })(
                     <Input
                       onChange={e =>
@@ -668,12 +549,7 @@ function EffectiveRate(props) {
               <Col span={8}>
                 <Form.Item label="Other ($)">
                   {getFieldDecorator("secondOtherCost", {
-                    rules: [
-                      {
-                        pattern: "^\\d+(.\\d+)?$",
-                        message: "Loan Amount ($) must be a number."
-                      }
-                    ]
+                    rules: [validation.number]
                   })(
                     <Input
                       onChange={e => setSecondOtherCost(Number(e.target.value))}
@@ -689,12 +565,7 @@ function EffectiveRate(props) {
               <Col span={6}>
                 <Form.Item label="Discount Rate (%)">
                   {getFieldDecorator("secondDiscountRate", {
-                    rules: [
-                      {
-                        pattern: "^\\d+(.\\d+)?$",
-                        message: "Loan Amount ($) must be a number."
-                      }
-                    ]
+                    rules: [validation.number, validation.percent]
                   })(
                     <Input
                       onChange={e =>

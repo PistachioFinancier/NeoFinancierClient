@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "antd/dist/antd.css";
+import validation from "../Scripts/validation";
+import { amortSchedCA } from "../Scripts/Amort";
+import { amortSchedUS } from "../Scripts/AmortUS";
 import {
   Row,
   Col,
@@ -10,14 +13,120 @@ import {
   Menu,
   Icon,
   Dropdown,
-  Checkbox
+  Checkbox,
+  DatePicker
 } from "antd";
 
 function EarlyRefinanceBenefit(props) {
   const [visible, setVisible] = useState(false);
   const [useUSSystem, setUseUSSystem] = useState(false);
+  const [loanAmount, setLoanAmount] = useState();
+  const [interestRate, setinterestRate] = useState();
+  const [term, setTerm] = useState();
+  const [amortization, setAmortization] = useState();
+  const [firstPayment, setFirstPayment] = useState();
+  const [prePayment, setPrePayment] = useState();
+  const [lenderCostOfFunds, setLenderCostOfFunds] = useState(0);
+  const [prepaymentPenalty, setPrePaymentPenalty] = useState(0);
+  const [loanAmountSavings, setLoanAmountSavings] = useState();
+  const [termSavings, setTermSavings] = useState(5);
+  const [interestRateSavings, setInterestRateSavings] = useState(0);
+  const [amortizationSavings, setAmortizationSavings] = useState(0);
+  const [additionalFeesSavings, setAdditionalFeesSavings] = useState(0);
+  const [finalSavings, setFinalSavings] = useState(0);
+  const [loanAmountBenefits, setLoanAmountBenefits] = useState(1000);
+  const [interestRateBenefits, setInterestRateBenefits] = useState(3);
+  const [termBenefits, setTermBenefits] = useState(20);
+  const [amortizationBenefits, setAmortizationBenefits] = useState(25);
+  const [annualReturns, setAnnualReturns] = useState(0);
+  const [additionalFeesBenefits, setAdditionalFeesBenefits] = useState(0);
+  const [finalBenefits, setFinalBenefits] = useState(0);
 
   const { getFieldDecorator } = props.form;
+
+  useEffect(() => {
+    if (
+      loanAmount &&
+      interestRate &&
+      term &&
+      amortization &&
+      firstPayment &&
+      prePayment
+    )
+      calculate();
+  });
+
+  const calculate = () => {
+    const market_Date = new Date(prePayment);
+    const start_Date = new Date(firstPayment);
+
+    const numberOfMonths =
+      12 *
+        Math.abs(
+          market_Date.getFullYear() -
+            start_Date.getFullYear() -
+            (market_Date.getMonth() < start_Date.getMonth() ? 1 : 0)
+        ) +
+      ((market_Date.getMonth() - start_Date.getMonth() < 0
+        ? market_Date.getMonth() - start_Date.getMonth() + 12
+        : market_Date.getMonth() - start_Date.getMonth()) +
+        (market_Date.getDate() >= start_Date.getDate() ? 1 : 0));
+
+    const schedule = amortSchedCA(
+      loanAmount,
+      interestRate,
+      term * 12,
+      amortization * 12
+    );
+
+    setTermSavings(term * 12 - numberOfMonths);
+    setLoanAmountSavings(schedule[numberOfMonths - 1]["principal remaining"]);
+
+    const interestRemaining =
+      schedule[term * 12 - 1]["accrued interest"] -
+      schedule[numberOfMonths]["accrued interest"];
+
+    let result =
+      Math.round(
+        ((loanAmountSavings * lenderCostOfFunds * 0.01) / 12) *
+          (term * 12 - numberOfMonths) *
+          100
+      ) / 100;
+
+    result = result + prepaymentPenalty;
+
+    const savingSched = amortSchedCA(
+      loanAmountSavings,
+      interestRateSavings,
+      termSavings,
+      amortizationSavings * 12
+    );
+
+    setFinalSavings(
+      interestRemaining -
+        loanAmountSavings * (additionalFeesSavings / 100) -
+        result -
+        savingSched.slice(-1)[0]["accrued interest"]
+    );
+
+    const benefitsSched = amortSchedCA(
+      loanAmountBenefits,
+      interestRateBenefits,
+      termBenefits * 12,
+      amortizationBenefits * 12
+    );
+
+    setFinalBenefits(
+      (loanAmountBenefits -
+        loanAmountBenefits * (additionalFeesBenefits / 100) -
+        result -
+        loanAmountSavings) *
+        ((0.01 * annualReturns) / 12) *
+        termBenefits *
+        12 -
+        benefitsSched.slice(-1)[0]["accrued interest"]
+    );
+  };
 
   return (
     <div>
@@ -37,129 +146,225 @@ function EarlyRefinanceBenefit(props) {
               onChange={e => {
                 setUseUSSystem(e.target.checked);
               }}
-            />
-            Check for US Banking Systems
+            >
+              Check for US System
+            </Checkbox>
           </Row>
-          <Col span={11}>
-            <Row>
-              <b>Existing Loan Information</b>
-            </Row>
 
-            <Row>
-              <Col span={8}>
-                <Row>
-                  Loan Amount ($)
-                  <Input />
-                </Row>
-                <Row>Ammortization (year)</Row>
-                <Row>
-                  <Input />
-                </Row>
-              </Col>
-              <Col span={8}>
-                <Row>Interest Rate (%)</Row>
-                <Row>
-                  <Input />
-                </Row>
-                <Row>First Payment Date</Row>
-                <Row>
-                  <Input />
-                </Row>
-              </Col>
-              <Col span={8}>
-                <Row>Term (year)</Row>
-                <Row>
-                  <Input />
-                </Row>
-                <Row>Pre-Payment Date</Row>
-                <Row>
-                  <Input />
-                </Row>
-              </Col>
-            </Row>
-            <Row>Lender Cost of Funds (%)</Row>
-            <Row>
-              <Input />
-              <p>
-                For Lender Cost of Funds Value, please use a government bond
-                rate that best approximates the remaining term on your mortgage
-                at the date you plan to terminate the mortgage.
-              </p>
-            </Row>
-            <Row>Minimum Pre-Payment Penalty ($)</Row>
-            <Row>
-              <Input />
-            </Row>
-            <Row>What do you want to calculate?</Row>
-            <Row></Row>
-          </Col>
-
-          <Col span={13}>
-            <Row>
-              <b>Refinancing Assumptions</b>
-            </Row>
-            <Col span={16}>
-              <Row>Market Value of Property at Date of Refinance ($)</Row>
-              <Row>
-                <Input />
-              </Row>
-              <Col span={12}>
-                <Row>Loan-to-Value (%)</Row>
-                <Row>
-                  <Input />
-                </Row>
-                <Row>Interest Rate (%)</Row>
-                <Row>
-                  <Input />
-                </Row>
-                <Row>Ammortization (year)</Row>
-                <Row>
-                  <Input />
-                </Row>
-              </Col>
-              <Col span={12}>
-                <Row>Loan Amount ($)</Row>
-                <Row>
-                  <Input />
-                </Row>
-                <Row>Term (year)</Row>
-                <Row>
-                  <Input />
-                </Row>
-              </Col>
-            </Col>
-            <Col span={8}>
-              <Row>Select entry type</Row>
-              <Row>
-                <Dropdown>
-                  {/* <a>
-                      Select type
-                      <Icon type="down" />
-                    </a> */}
-                  <Menu slot="overlay">
-                    <Menu.Item>{/* <a>LTV (loan to value %)</a> */}</Menu.Item>
-                    <Menu.Item>{/* <a>Loan Amount</a> */}</Menu.Item>
-                  </Menu>
-                </Dropdown>
-              </Row>
-            </Col>
-          </Col>
           <Row>
-            <Col span={5}>
+            <Col span={11}>
+              <Row>Existing Loan Information</Row>
               <Row>
-                Interest Rate at Renewal (%)
-                <Input></Input>
+                <Col span={8}>
+                  <Form.Item label="Loan Amount ($)">
+                    {getFieldDecorator("loanAmount", {
+                      rules: [validation.number]
+                    })(
+                      <Input
+                        onChange={e => setLoanAmount(Number(e.target.value))}
+                      />
+                    )}
+                  </Form.Item>
+                  <Form.Item label="Amortization">
+                    {getFieldDecorator("amortization", {
+                      rules: [validation.number]
+                    })(
+                      <Input
+                        onChange={e => setAmortization(Number(e.target.value))}
+                      />
+                    )}
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item label="Interest Rate (%)">
+                    {getFieldDecorator("interestRate", {
+                      rules: [validation.number, validation.percent]
+                    })(
+                      <Input
+                        onChange={e => setinterestRate(Number(e.target.value))}
+                      />
+                    )}
+                  </Form.Item>
+                  First Payment Date
+                  <DatePicker
+                    onChange={date => {
+                      setFirstPayment(date);
+                    }}
+                  />
+                </Col>
+                <Col span={8}>
+                  <Form.Item label="Term">
+                    {getFieldDecorator("term", {
+                      rules: [validation.number]
+                    })(
+                      <Input onChange={e => setTerm(Number(e.target.value))} />
+                    )}
+                  </Form.Item>
+                  Pre-Payment Date
+                  <DatePicker
+                    onChange={date => {
+                      setPrePayment(date);
+                    }}
+                  />
+                </Col>
               </Row>
               <Row>
-                Additional Fees (%)
-                <Input></Input>
+                <Form.Item label="Lender Cost of Funds">
+                  {getFieldDecorator("lenderCostOfFunds", {
+                    rules: [validation.number]
+                  })(
+                    <Input
+                      onChange={e =>
+                        setLenderCostOfFunds(Number(e.target.value))
+                      }
+                    />
+                  )}
+                </Form.Item>
+              </Row>
+              <Row>
+                <Form.Item label="Pre-Payment Penalty">
+                  {getFieldDecorator("prepaymentPenalty", {
+                    rules: [validation.number]
+                  })(
+                    <Input
+                      onChange={e =>
+                        setPrePaymentPenalty(Number(e.target.value))
+                      }
+                    />
+                  )}
+                </Form.Item>
+              </Row>
+              <Row>
+                <Col span={12}>Remaining Balance ($) {loanAmountSavings}</Col>
+                <Col span={12}>Remaining Term {termSavings}</Col>
               </Row>
             </Col>
-            <Col span={7}>
-              Simple Annual Return on Additional Proceeds (%)
-              <Input></Input>
+            <Col span={13}>
+              <Row>Refinancing Assumptions</Row>
+              <Row>
+                <Col span={8}>
+                  <Form.Item label="New Interest Rate">
+                    {getFieldDecorator("interestRateSavings", {
+                      rules: [validation.number, validation.percent]
+                    })(
+                      <Input
+                        onChange={e =>
+                          setInterestRateSavings(Number(e.target.value))
+                        }
+                      />
+                    )}
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item label="New Amortization">
+                    {getFieldDecorator("amortizationSavings", {
+                      rules: [validation.number, validation.percent]
+                    })(
+                      <Input
+                        onChange={e =>
+                          setAmortizationSavings(Number(e.target.value))
+                        }
+                      />
+                    )}
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item label="Additional Fees">
+                    {getFieldDecorator("additionalFeesSavings", {
+                      rules: [validation.number, validation.percent]
+                    })(
+                      <Input
+                        onChange={e =>
+                          setAdditionalFeesSavings(Number(e.target.value))
+                        }
+                      />
+                    )}
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row>Final Savings = ${finalSavings}</Row>
+              <Row>
+                <Col span={12}>
+                  <Form.Item label="New Loan Amount">
+                    {getFieldDecorator("loanAmountBenefits", {
+                      rules: [validation.number, validation.percent]
+                    })(
+                      <Input
+                        onChange={e =>
+                          setLoanAmountBenefits(Number(e.target.value))
+                        }
+                      />
+                    )}
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item label="New Interest Rate">
+                    {getFieldDecorator("interestRateBenefits", {
+                      rules: [validation.number, validation.percent]
+                    })(
+                      <Input
+                        onChange={e =>
+                          setInterestRateBenefits(Number(e.target.value))
+                        }
+                      />
+                    )}
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row>
+                <Col span={12}>
+                  <Form.Item label="New Term">
+                    {getFieldDecorator("termBenefits", {
+                      rules: [validation.number, validation.percent]
+                    })(
+                      <Input
+                        onChange={e => setTermBenefits(Number(e.target.value))}
+                      />
+                    )}
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item label="New Amortization">
+                    {getFieldDecorator("amortizationBenefits", {
+                      rules: [validation.number]
+                    })(
+                      <Input
+                        onChange={e =>
+                          setAmortizationBenefits(Number(e.target.value))
+                        }
+                      />
+                    )}
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row>
+                <Col span={12}>
+                  <Form.Item label="Annual Return Rate (%)">
+                    {getFieldDecorator("annualReturns", {
+                      rules: [validation.number, validation.percent]
+                    })(
+                      <Input
+                        onChange={e => setAnnualReturns(Number(e.target.value))}
+                      />
+                    )}
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item label="Additional Fees (%)">
+                    {getFieldDecorator("additionalFeesBenefits", {
+                      rules: [validation.number, validation.percent]
+                    })(
+                      <Input
+                        onChange={e =>
+                          setAdditionalFeesBenefits(Number(e.target.value))
+                        }
+                      />
+                    )}
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row>Final Benefit = {finalBenefits}</Row>
             </Col>
-            Final Benefit
           </Row>
         </Form>
       </Modal>
@@ -167,204 +372,6 @@ function EarlyRefinanceBenefit(props) {
   );
 }
 
-// class EarlyRefinanceBenefit extends React.Component {
-//   state = {
-//     visible: false,
-//     fields: {
-//       USBankingSystem: false,
-//       loanAmount: null,
-//       interestRate: null,
-//       term: null,
-//       amortization: null,
-//       firstPaymentDate: null,
-//       prePaymentDate: null,
-//       lenderCostOfFunds: null,
-//       minPrePaymentPenalty: null,
-//       checkForFinalBenefit: true,
-//       marketValueAtDateOfRefinance: null,
-//       entryType: null,
-//       loanToValue: null
-//     }
-//   };
-
-//   showModal = () => {
-//     this.setState({
-//       visible: true
-//     });
-//   };
-
-//   handleOk = e => {
-//     this.setState({
-//       visible: false
-//     });
-//   };
-
-//   handleCancel = e => {
-//     this.setState({
-//       visible: false
-//     });
-//   };
-
-//   handleField = (fieldName, event) => {
-//     this.setState(
-//       {
-//         fields: {
-//           ...this.state.fields,
-//           [fieldName]: Number(event.target.value)
-//         }
-//       },
-//       () => {}
-//     );
-//   };
-
-//   render() {
-//     const { getFieldDecorator } = this.props.form;
-//     return (
-//       <div>
-//         <Button type="primary" onClick={this.showModal}>
-//           Early Refinance Benefit Calculator
-//         </Button>
-//         <Modal
-//           title="Early Refinance Benefit Calculator"
-//           visible={this.state.visible}
-//           onOk={this.handleOk}
-//           onCancel={this.handleCancel}
-//           width="1000px"
-//           height="800px"
-//         >
-//           <Form>
-//             <Row>
-//               {/* <input type="checkbox">Check for US Banking Systems</input> */}
-//             </Row>
-//             <Col span={11}>
-//               <Row>
-//                 <b>Existing Loan Information</b>
-//               </Row>
-
-//               <Row>
-//                 <Col span={8}>
-//                   <Row>
-//                     Loan Amount ($)
-//                     <Input />
-//                   </Row>
-//                   <Row>Ammortization (year)</Row>
-//                   <Row>
-//                     <Input />
-//                   </Row>
-//                 </Col>
-//                 <Col span={8}>
-//                   <Row>Interest Rate (%)</Row>
-//                   <Row>
-//                     <Input />
-//                   </Row>
-//                   <Row>First Payment Date</Row>
-//                   <Row>
-//                     <Input />
-//                   </Row>
-//                 </Col>
-//                 <Col span={8}>
-//                   <Row>Term (year)</Row>
-//                   <Row>
-//                     <Input />
-//                   </Row>
-//                   <Row>Pre-Payment Date</Row>
-//                   <Row>
-//                     <Input />
-//                   </Row>
-//                 </Col>
-//               </Row>
-//               <Row>Lender Cost of Funds (%)</Row>
-//               <Row>
-//                 <Input />
-//                 <p>
-//                   For Lender Cost of Funds Value, please use a government bond
-//                   rate that best approximates the remaining term on your
-//                   mortgage at the date you plan to terminate the mortgage.
-//                 </p>
-//               </Row>
-//               <Row>Minimum Pre-Payment Penalty ($)</Row>
-//               <Row>
-//                 <Input />
-//               </Row>
-//               <Row>What do you want to calculate?</Row>
-//               <Row></Row>
-//             </Col>
-
-//             <Col span={13}>
-//               <Row>
-//                 <b>Refinancing Assumptions</b>
-//               </Row>
-//               <Col span={16}>
-//                 <Row>Market Value of Property at Date of Refinance ($)</Row>
-//                 <Row>
-//                   <Input />
-//                 </Row>
-//                 <Col span={12}>
-//                   <Row>Loan-to-Value (%)</Row>
-//                   <Row>
-//                     <Input />
-//                   </Row>
-//                   <Row>Interest Rate (%)</Row>
-//                   <Row>
-//                     <Input />
-//                   </Row>
-//                   <Row>Ammortization (year)</Row>
-//                   <Row>
-//                     <Input />
-//                   </Row>
-//                 </Col>
-//                 <Col span={12}>
-//                   <Row>Loan Amount ($)</Row>
-//                   <Row>
-//                     <Input />
-//                   </Row>
-//                   <Row>Term (year)</Row>
-//                   <Row>
-//                     <Input />
-//                   </Row>
-//                 </Col>
-//               </Col>
-//               <Col span={8}>
-//                 <Row>Select entry type</Row>
-//                 <Row>
-//                   <Dropdown>
-//                     {/* <a>
-//                       Select type
-//                       <Icon type="down" />
-//                     </a> */}
-//                     <Menu slot="overlay">
-//                       <Menu.Item>
-//                         {/* <a>LTV (loan to value %)</a> */}
-//                       </Menu.Item>
-//                       <Menu.Item>{/* <a>Loan Amount</a> */}</Menu.Item>
-//                     </Menu>
-//                   </Dropdown>
-//                 </Row>
-//               </Col>
-//             </Col>
-//             <Row>
-//               <Col span={5}>
-//                 <Row>
-//                   Interest Rate at Renewal (%)
-//                   <Input></Input>
-//                 </Row>
-//                 <Row>
-//                   Additional Fees (%)
-//                   <Input></Input>
-//                 </Row>
-//               </Col>
-//               <Col span={7}>
-//                 Simple Annual Return on Additional Proceeds (%)
-//                 <Input></Input>
-//               </Col>
-//               Final Benefit
-//             </Row>
-//           </Form>
-//         </Modal>
-//       </div>
-//     );
-//   }
-// }
 const WrappedEarlyRefinanceBenefit = Form.create({ name: "register" })(
   EarlyRefinanceBenefit
 );

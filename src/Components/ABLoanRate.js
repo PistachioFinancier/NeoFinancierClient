@@ -25,11 +25,50 @@ function ABLoanRate(props) {
       firstInterestRate &&
       secondInterestRate
     ) {
-      calculateLoanAmount();
+      updateCombinedLoanAmount();
+      updateCombinedLoanToInterest();
+      updateCombinedLoanLTV();
     }
   });
 
-  function calculateLoanAmount() {}
+  useEffect(() => {
+    if (propertyValue) {
+      updateLoanToValue();
+    }
+  });
+
+  const updateLoanToValue = () => {
+    if (propertyValue && firstLoanAmount) {
+      setFirstLoanToValue(
+        Math.round((firstLoanAmount / propertyValue) * 10000) / 100
+      );
+    }
+
+    if (propertyValue && secondLoanAmount) {
+      setSecondLoanToValue(
+        Math.round((secondLoanAmount / propertyValue) * 10000) / 100
+      );
+    }
+  };
+
+  const updateCombinedLoanAmount = () => {
+    setCombinedLoanAmount(firstLoanAmount + secondLoanAmount);
+  };
+
+  const updateCombinedLoanToInterest = () => {
+    const combinedLoanInterest = (
+      (firstLoanAmount * firstInterestRate +
+        secondLoanAmount * secondInterestRate) /
+      (firstLoanAmount + secondLoanAmount)
+    ).toFixed(2);
+
+    setCombinedLoanInterest(combinedLoanInterest);
+  };
+
+  const updateCombinedLoanLTV = () => {
+    const combinedLoanLTV = firstLoanToValue + secondLoanToValue;
+    setCombinedLoanLTV(combinedLoanLTV);
+  };
 
   return (
     <div>
@@ -52,7 +91,7 @@ function ABLoanRate(props) {
                 })(
                   <Input
                     onChange={e => {
-                      setPropertyValue(e.target.value);
+                      setPropertyValue(Number(e.target.value));
                     }}
                   />
                 )}
@@ -70,7 +109,7 @@ function ABLoanRate(props) {
                 })(
                   <Input
                     onChange={e => {
-                      setFirstLoanAmount(e.target.value);
+                      setFirstLoanAmount(Number(e.target.value));
                     }}
                   />
                 )}
@@ -83,7 +122,7 @@ function ABLoanRate(props) {
                 })(
                   <Input
                     onChange={e => {
-                      setFirstInterestRate(e.target.value);
+                      setFirstInterestRate(Number(e.target.value));
                     }}
                   />
                 )}
@@ -106,7 +145,7 @@ function ABLoanRate(props) {
                 })(
                   <Input
                     onChange={e => {
-                      setSecondLoanAmount(e.target.value);
+                      setSecondLoanAmount(Number(e.target.value));
                     }}
                   />
                 )}
@@ -119,7 +158,7 @@ function ABLoanRate(props) {
                 })(
                   <Input
                     onChange={e => {
-                      setSecondInterestRate(e.target.value);
+                      setSecondInterestRate(Number(e.target.value));
                     }}
                   />
                 )}
@@ -145,56 +184,6 @@ function ABLoanRate(props) {
     </div>
   );
 }
-
-// class asf extends React.Component {
-//   updateLoanToValue = () => {
-//     if (this.state.fields.propertyValue && this.state.fields.firstLoanAmount) {
-//       const firstLoanToValue = (
-//         (this.state.fields.firstLoanAmount / this.state.fields.propertyValue) *
-//         100
-//       ).toFixed(2);
-
-//       this.setState({
-//         fields: { ...this.state.fields, firstLoanToValue }
-//       });
-//     }
-
-//     if (this.state.fields.propertyValue && this.state.fields.secondLoanAmount) {
-//       const secondLoanToValue = (
-//         (this.state.fields.secondLoanAmount / this.state.fields.propertyValue) *
-//         100
-//       ).toFixed(2);
-
-//       this.setState({
-//         fields: { ...this.state.fields, secondLoanToValue }
-//       });
-//     }
-//   };
-
-//   updateCombinedLoanAmount = () => {
-//     const combinedLoanAmount =
-//       Number(this.state.fields.firstLoanAmount) +
-//       Number(this.state.fields.secondLoanAmount);
-//     this.setState({ combinedLoanAmount });
-//   };
-
-//   updateCombinedLoanToInterest = () => {
-//     const combinedLoanInterest = (
-//       (this.state.fields.firstLoanAmount * this.state.fields.firstInterestRate +
-//         this.state.fields.secondLoanAmount *
-//           this.state.fields.secondInterestRate) /
-//       (this.state.fields.firstLoanAmount + this.state.fields.secondLoanAmount)
-//     ).toFixed(2);
-//     this.setState({ combinedLoanInterest });
-//   };
-
-//   updateCombinedLoanLTV = () => {
-//     const combinedLoanLTV =
-//       Number(this.state.fields.firstLoanToValue) +
-//       Number(this.state.fields.secondLoanToValue);
-//     this.setState({ combinedLoanLTV });
-//   };
-// }
 
 const WrappedABLoanRate = Form.create({ name: "register" })(ABLoanRate);
 
