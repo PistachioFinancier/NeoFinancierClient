@@ -1,5 +1,4 @@
 import { amortSchedCA } from "./Amort";
-import { number } from "prop-types";
 
 // TODO: Check this formula
 const loanMarkToMarket = (

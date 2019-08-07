@@ -211,7 +211,7 @@ function EarlyRefinanceBenefit(props) {
               <Row>
                 <Form.Item label="Lender Cost of Funds">
                   {getFieldDecorator("lenderCostOfFunds", {
-                    rules: [validation.number]
+                    rules: [validation.number, validation.percent]
                   })(
                     <Input
                       onChange={e =>
@@ -258,7 +258,7 @@ function EarlyRefinanceBenefit(props) {
                 <Col span={8}>
                   <Form.Item label="New Amortization">
                     {getFieldDecorator("amortizationSavings", {
-                      rules: [validation.number, validation.percent]
+                      rules: [validation.number]
                     })(
                       <Input
                         onChange={e =>
@@ -271,7 +271,7 @@ function EarlyRefinanceBenefit(props) {
                 <Col span={8}>
                   <Form.Item label="Additional Fees">
                     {getFieldDecorator("additionalFeesSavings", {
-                      rules: [validation.number, validation.percent]
+                      rules: [validation.number]
                     })(
                       <Input
                         onChange={e =>
@@ -287,7 +287,7 @@ function EarlyRefinanceBenefit(props) {
                 <Col span={12}>
                   <Form.Item label="New Loan Amount">
                     {getFieldDecorator("loanAmountBenefits", {
-                      rules: [validation.number, validation.percent]
+                      rules: [validation.number]
                     })(
                       <Input
                         onChange={e =>
@@ -315,7 +315,7 @@ function EarlyRefinanceBenefit(props) {
                 <Col span={12}>
                   <Form.Item label="New Term">
                     {getFieldDecorator("termBenefits", {
-                      rules: [validation.number, validation.percent]
+                      rules: [validation.number]
                     })(
                       <Input
                         onChange={e => setTermBenefits(Number(e.target.value))}
