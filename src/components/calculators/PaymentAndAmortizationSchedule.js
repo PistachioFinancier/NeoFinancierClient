@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
-import "antd/dist/antd.css";
 import { Row, Col, Input, Form, Modal, Button, Table } from "antd";
-import { amortSchedCA } from "../Scripts/Amort";
-import { amortSchedUS } from "../Scripts/AmortUS";
-import validation from "../Scripts/validation";
+import { amortSchedCA } from "../../scripts/amortCA";
+import { amortSchedUS } from "../../scripts/amortUS";
+import validation from "../../scripts/validation";
 
 function PaymentAndAmortizationSchedule(props) {
   const [visible, setVisible] = useState(false);

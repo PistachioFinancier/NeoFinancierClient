@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
-import "antd/dist/antd.css";
 import { Row, Col, Input, Form, Modal, Button } from "antd";
 import { DatePicker } from "antd";
 import { Menu, Dropdown, Icon } from "antd";
-import loanMarkToMarket from "../Scripts/LoanMarkToMarketFormula";
-import validation from "../Scripts/validation";
+import loanMarkToMarket from "../../scripts/loanMarkToMarketFormula";
+import validation from "../../scripts/validation";
 
 function LoanMarkToMarket(props) {
   const [visible, setVisible] = useState(false);

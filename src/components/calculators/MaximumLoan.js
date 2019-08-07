@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import "antd/dist/antd.css";
 import { Row, Col, Input, Form, Modal, Button } from "antd";
-import validation from "../Scripts/validation";
+import validation from "../../scripts/validation";
 
 function MaximumLoan(props) {
   const [visible, setVisible] = useState(false);

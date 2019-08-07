@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import "antd/dist/antd.css";
-import validation from "../Scripts/validation";
-import { amortSchedCA } from "../Scripts/Amort";
-import { amortSchedUS } from "../Scripts/AmortUS";
+import validation from "../../scripts/validation";
+import { amortSchedCA } from "../../scripts/amortCA";
+// import { amortSchedUS } from "../../scripts/AmortUS";
 import {
   Row,
   Col,
@@ -10,9 +9,6 @@ import {
   Form,
   Modal,
   Button,
-  Menu,
-  Icon,
-  Dropdown,
   Checkbox,
   DatePicker
 } from "antd";
@@ -282,7 +278,7 @@ function EarlyRefinanceBenefit(props) {
                   </Form.Item>
                 </Col>
               </Row>
-              <Row>Final Savings = ${finalSavings}</Row>
+              <Row>Final Savings = ${finalSavings.toFixed(2)}</Row>
               <Row>
                 <Col span={12}>
                   <Form.Item label="New Loan Amount">
@@ -363,7 +359,7 @@ function EarlyRefinanceBenefit(props) {
                   </Form.Item>
                 </Col>
               </Row>
-              <Row>Final Benefit = {finalBenefits}</Row>
+              <Row>Final Benefit = {finalBenefits.toFixed(2)}</Row>
             </Col>
           </Row>
         </Form>

@@ -1,4 +1,4 @@
-import { amortSchedCA } from "./Amort";
+import { amortSchedCA } from "./amortCA";
 
 // TODO: Check this formula
 const loanMarkToMarket = (

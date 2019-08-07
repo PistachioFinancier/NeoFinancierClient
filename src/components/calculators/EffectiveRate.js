@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
-import "antd/dist/antd.css";
 import { Row, Col, Input, Form, Modal, Button } from "antd";
-import { amortSchedCA, discountedCA } from "../Scripts/Amort";
-import { amortSchedUS } from "../Scripts/AmortUS";
+import { amortSchedCA, discountedCA } from "../../scripts/amortCA";
+import { amortSchedUS } from "../../scripts/amortUS";
 import { Select } from "antd";
 import EffectiveInterestCalculator from "effective-interest-rate";
-import validation from "../Scripts/validation";
+import validation from "../../scripts/validation";
 
 function EffectiveRate(props) {
   const [visible, setVisible] = useState(false);
