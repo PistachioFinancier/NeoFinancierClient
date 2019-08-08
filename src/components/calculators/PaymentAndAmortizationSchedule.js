@@ -167,7 +167,7 @@ function PaymentAndAmortizationSchedule(props) {
               </Row>
             </Form>
           </Col>
-          <Col span={12} visible={scheduleSwitch}>
+          <Col span={12}>
             <Table dataSource={schedule} columns={columns} />;
           </Col>
         </Row>
