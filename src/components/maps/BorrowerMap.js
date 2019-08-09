@@ -1,9 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { Map, GoogleApiWrapper, Marker } from "google-maps-react";
+import { Map, Marker, GoogleApiWrapper, InfoWindow } from "google-maps-react";
 import Geocode from "react-geocode";
 
-function BorrowerMap(props) {
-  const [coordinates, setCoordinates] = useState([]);
+const apiKey = "AIzaSyC3fatvZECW_8oamH3dFXefvaZ1ro2diXU";
+Geocode.setApiKey(apiKey);
+
+function LenderMap(props) {
+  const [places, setPlaces] = useState([
+    {
+      title: "Toronto",
+      name: "Toronto",
+      address: "301 Front St W, Toronto",
+      coordinates: { lat: 43.642567, lng: -79.387054 }
+    }
+  ]);
+
+  const [activeMarker, setActiveMarker] = useState({});
+  const [selectedPlace, setSelectedPlace] = useState({});
+  const [showInfoWindow, setShowInfoWindow] = useState(false);
 
   const mapStyles = {
     width: "70%",
@@ -12,36 +26,85 @@ function BorrowerMap(props) {
   };
 
   useEffect(() => {
-    setCoordinates(props.coordinates[0]);
-  }, [props.coordinates[0]]);
+    const fetchPlacesData = async places => {
+      const result = await getAddresses(places);
+      setPlaces(result);
+    };
+    fetchPlacesData(props.places);
+  }, [props.places]);
 
-  let marker = [];
+  /**
+   * Returns an array of JSONs containing the given location information
+   * and the coordinates for each one of them.
+   * @param {{Title: String, Name: String, Address: String}[]} places
+   */
+  const getAddresses = async places => {
+    /**
+     * Returns a promise that would return a JSON with the given location
+     * information, plus its coordinates.
+     * @param {{Title: String, Name: String, Address: String}} place
+     */
+    const GeoPromise = place =>
+      new Promise((resolve, reject) => {
+        Geocode.fromAddress(place.address).then(
+          response => {
+            const { lat, lng } = response.results[0].geometry.location;
+            resolve({ ...place, coordinates: { lat, lng } });
+          },
+          error => {
+            resolve(null); // Even if we fail, we still want to display the rest of the locations
+          }
+        );
+      });
 
-  marker.push(
-    <Marker
-      title={"The marker`s title will appear as a tooltip."}
-      name={"SOMA"}
-      position={coordinates}
-    />
+    const result = await Promise.all(
+      places.map(place => GeoPromise(place))
+    ).then(result => result.filter(place => place)); // Remove null values
+    return result;
+  };
+
+  const onMarkerClick = (props, marker, e) => {
+    setSelectedPlace(props);
+    setActiveMarker(marker);
+    setShowInfoWindow(true);
+  };
+
+  const onMapClicked = props => {
+    if (showInfoWindow) {
+      setShowInfoWindow(false);
+      setActiveMarker(null);
+    }
+  };
+
+  return (
+    <div>
+      <Map
+        google={props.google}
+        zoom={4}
+        style={mapStyles}
+        initialCenter={props.center}
+        scrollwheel={false}
+        onClick={onMapClicked}
+      >
+        {places.map(place => (
+          <Marker
+            key={place.address}
+            title={place.title}
+            name={place.name}
+            position={place.coordinates}
+            onClick={onMarkerClick}
+          />
+        ))}
+        <InfoWindow marker={activeMarker} visible={showInfoWindow}>
+          <div>
+            <h1>{selectedPlace.name}</h1>
+          </div>
+        </InfoWindow>
+      </Map>
+    </div>
   );
-
-  if (props.coordinates[0]) {
-    return (
-      <div>
-        <Map
-          google={props.google}
-          zoom={4}
-          style={mapStyles}
-          initialCenter={props.center}
-          scrollwheel={false}
-        >
-          {marker}
-        </Map>
-      </div>
-    );
-  } else {
-    return <div>Loading Map...</div>;
-  }
 }
 
-export default BorrowerMap;
+export default GoogleApiWrapper({
+  apiKey
+})(LenderMap);
