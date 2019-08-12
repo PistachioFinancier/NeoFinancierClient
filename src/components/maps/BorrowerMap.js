@@ -3,6 +3,7 @@ import { Map, Marker, GoogleApiWrapper, InfoWindow } from "google-maps-react";
 import Geocode from "react-geocode";
 
 const apiKey = "AIzaSyC3fatvZECW_8oamH3dFXefvaZ1ro2diXU";
+
 Geocode.setApiKey(apiKey);
 
 function LenderMap(props) {
@@ -52,6 +53,7 @@ function LenderMap(props) {
             resolve({ ...place, coordinates: { lat, lng } });
           },
           error => {
+            console.log(place.address + " has failed");
             resolve(null); // Even if we fail, we still want to display the rest of the locations
           }
         );
@@ -64,6 +66,7 @@ function LenderMap(props) {
   };
 
   const onMarkerClick = (props, marker, e) => {
+    console.log(marker);
     setSelectedPlace(props);
     setActiveMarker(marker);
     setShowInfoWindow(true);
@@ -76,6 +79,54 @@ function LenderMap(props) {
     }
   };
 
+  const selectedPlaceInfo = showInfoWindow ? (
+    <div>
+      <h1 style={{ textAlign: "center" }}>{selectedPlace.name}</h1>
+      <h4 style={{ textAlign: "center" }}>
+        {selectedPlace.clientPlace.address}
+      </h4>
+      <table>
+        <tr>
+          <td>
+            <div>
+              <img
+                src={
+                  "https://maps.googleapis.com/maps/api/streetview?location=" +
+                  activeMarker.clientPlace.address +
+                  "&size=175x175&key=" +
+                  apiKey
+                }
+                alt={"Image of " + selectedPlace.name}
+              />
+            </div>
+          </td>
+          <td>
+            <div style={{ marginLeft: "10px", marginTop: "10px" }}>
+              <h4>Value:</h4>
+              <p>{activeMarker.clientPlace.value}</p>
+              <br />
+              <h4>Loan Amount:</h4>
+              <p>{activeMarker.clientPlace.loan_amount}</p>
+              <br />
+              <h4>Expiry Date:</h4>
+              <p>{activeMarker.clientPlace.expiry_date}</p>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+  ) : (
+    <div></div>
+  );
+
+  // Create the bounds to center the map
+  // TODO: Fix the issue where the map recenters upon every rerender
+  const points = places.map(place => place.coordinates);
+  const bounds = new props.google.maps.LatLngBounds();
+  for (let i = 0; i < points.length; i++) {
+    bounds.extend(points[i]);
+  }
+
   return (
     <div>
       <Map
@@ -85,6 +136,7 @@ function LenderMap(props) {
         initialCenter={props.center}
         scrollwheel={false}
         onClick={onMapClicked}
+        bounds={bounds}
       >
         {places.map(place => (
           <Marker
@@ -93,12 +145,11 @@ function LenderMap(props) {
             name={place.name}
             position={place.coordinates}
             onClick={onMarkerClick}
+            clientPlace={place}
           />
         ))}
         <InfoWindow marker={activeMarker} visible={showInfoWindow}>
-          <div>
-            <h1>{selectedPlace.name}</h1>
-          </div>
+          {selectedPlaceInfo}
         </InfoWindow>
       </Map>
     </div>
