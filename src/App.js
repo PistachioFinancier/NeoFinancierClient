@@ -52,10 +52,7 @@ function App() {
       </div>
       */}
       <div>
-        <BorrowerMap
-          places={places}
-          center={{ lat: 52.8415678, lng: -95.153671399999993 }}
-        />
+        <BorrowerMap places={places} />
       </div>
       <br></br>
       <br></br>

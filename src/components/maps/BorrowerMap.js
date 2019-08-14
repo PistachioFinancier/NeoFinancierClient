@@ -66,7 +66,6 @@ function LenderMap(props) {
   };
 
   const onMarkerClick = (props, marker, e) => {
-    console.log(marker);
     setSelectedPlace(props);
     setActiveMarker(marker);
     setShowInfoWindow(true);
@@ -120,23 +119,26 @@ function LenderMap(props) {
   );
 
   // Create the bounds to center the map
-  // TODO: Fix the issue where the map recenters upon every rerender
   const points = places.map(place => place.coordinates);
   const bounds = new props.google.maps.LatLngBounds();
   for (let i = 0; i < points.length; i++) {
     bounds.extend(points[i]);
   }
 
+  const mapCenter = {
+    lat: bounds.getCenter().lat(),
+    lng: bounds.getCenter().lng()
+  };
+
   return (
     <div>
       <Map
         google={props.google}
-        zoom={4}
+        zoom={6}
         style={mapStyles}
-        initialCenter={props.center}
+        initialCenter={mapCenter}
         scrollwheel={false}
         onClick={onMapClicked}
-        bounds={bounds}
       >
         {places.map(place => (
           <Marker
