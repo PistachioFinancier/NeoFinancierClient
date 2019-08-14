@@ -1,7 +1,7 @@
 import React from "react";
 import "antd/dist/antd.css";
-import Calculators from "./components/calculators/CalculatorsMain";
-import LenderMap from "./components/lenders/LenderMap";
+import Calculators from "./components/calculators/Calculators";
+import LenderMap from "./components/lenders/lenderPage/LenderMap";
 import BorrowerMap from "./components/borrowers/BorrowerMap";
 import RealnetMarketData from "./components/borrowers/RealnetMarketData";
 

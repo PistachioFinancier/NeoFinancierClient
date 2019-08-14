@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Map, GoogleApiWrapper, Polygon } from "google-maps-react";
-import provinces from "../../resources/provinceCoordinates";
+import provinces from "../../../resources/provinceCoordinates";
 
 function LenderMap(props) {
   const mapStyles = {
