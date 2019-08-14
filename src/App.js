@@ -4,6 +4,7 @@ import Calculators from "./components/calculators/Calculators";
 import LenderMap from "./components/lenders/lenderPage/LenderMap";
 import BorrowerMap from "./components/borrowers/BorrowerMap";
 import RealnetMarketData from "./components/borrowers/RealnetMarketData";
+import LenderList from "./components/lenders/lenderList/LenderList";
 
 function App() {
   const places = [
@@ -55,7 +56,8 @@ function App() {
       {/*<div>
         <BorrowerMap places={places} />
       </div>*/}
-      <RealnetMarketData />
+      {/* <RealnetMarketData /> */}
+      <LenderList></LenderList>
     </div>
   );
 }
