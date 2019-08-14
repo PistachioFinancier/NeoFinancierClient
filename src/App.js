@@ -1,9 +1,9 @@
 import React from "react";
 import "antd/dist/antd.css";
-import Calculators from "./components/Calculators";
-import LenderMap from "./components/maps/LenderMap";
-import BorrowerMap from "./components/maps/BorrowerMap";
-import RealnetMarketData from "./components/RealnetMarketData";
+import Calculators from "./components/calculators/CalculatorsMain";
+import LenderMap from "./components/lenders/LenderMap";
+import BorrowerMap from "./components/borrowers/BorrowerMap";
+import RealnetMarketData from "./components/borrowers/RealnetMarketData";
 
 function App() {
   const places = [
@@ -43,7 +43,7 @@ function App() {
 
   return (
     <div className="App">
-      <Calculators />
+      {/* <Calculators /> */}
       {/*
       <div>
         <LenderMap

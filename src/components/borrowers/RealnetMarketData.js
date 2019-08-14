@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Papa from "papaparse";
-import realnetCSV from "../resources/realnetUpdated.csv";
+import realnetCSV from "../../resources/realnetUpdated.csv";
 import PieChart from "./PieChart";
 
 function RealnetMarketData() {

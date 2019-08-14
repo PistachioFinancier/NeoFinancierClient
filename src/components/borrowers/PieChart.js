@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Table } from "antd";
-import CanvasJSReact from "../assets/canvasjs.react";
+import CanvasJSReact from "../../assets/canvasjs.react";
 
 const CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
