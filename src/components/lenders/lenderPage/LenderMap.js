@@ -5,8 +5,7 @@ import provinces from "../../../resources/provinceCoordinates";
 function LenderMap(props) {
   const mapStyles = {
     width: "70%",
-    height: "70%",
-    position: "relative"
+    height: "70%"
   };
 
   useEffect(() => {
@@ -28,7 +27,7 @@ function LenderMap(props) {
   return (
     <Map
       google={props.google}
-      zoom={4}
+      zoom={3}
       style={mapStyles}
       initialCenter={props.center}
       scrollwheel={false}

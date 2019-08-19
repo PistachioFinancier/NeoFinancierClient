@@ -5,6 +5,7 @@ import LenderMap from "./components/lenders/lenderPage/LenderMap";
 import BorrowerMap from "./components/borrowers/BorrowerMap";
 import RealnetMarketData from "./components/borrowers/RealnetMarketData";
 import LenderList from "./components/lenders/lenderList/LenderList";
+import LenderPage from "./components/lenders/lenderPage/LenderPage";
 
 function App() {
   const places = [
@@ -57,7 +58,8 @@ function App() {
         <BorrowerMap places={places} />
       </div>*/}
       {/* <RealnetMarketData /> */}
-      <LenderList></LenderList>
+      {/*<LenderList></LenderList>*/}
+      <LenderPage />
     </div>
   );
 }
