@@ -1,18 +1,21 @@
 import React from "react";
-import { Pie } from "react-chartjs-2";
+import { Doughnut } from "react-chartjs-2";
 
 function PortfolioMixGraph(props) {
   const data = {
     datasets: [
       {
-        data: [10, 20, 30]
+        data: [100, 33, 45],
+        backgroundColor: ["#FF0000", "#13C62B", "#007CFF"],
+        hoverBackgroundColor: ["#FF0000", "#13C62B", "#007CFF"]
       }
     ],
-
-    // These labels appear in the legend and in the tooltips when hovering different arcs
-    labels: ["Red", "Yellow", "Blue"]
+    labels: ["Red", "Green", "Blue"]
   };
-  return <Pie data={data} />;
+  const options = {
+    cutoutPercentage: 70
+  };
+  return <Doughnut data={data} options={options} />;
 }
 
 export default PortfolioMixGraph;

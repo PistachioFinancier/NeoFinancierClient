@@ -4,7 +4,7 @@ import provinces from "../../../resources/provinceCoordinates";
 
 function LenderMap(props) {
   const mapStyles = {
-    width: "70%",
+    width: "100%",
     height: "70%"
   };
 
