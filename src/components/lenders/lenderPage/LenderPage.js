@@ -5,7 +5,7 @@ import OriginationsGraph from "./OriginationsGraph";
 import PortfolioMixGraph from "./PortfolioMixGraph";
 import LenderMap from "./LenderMap";
 import im from "../../../assets/logo.png";
-import ProceedButton from "./ProceedButton";
+import Button from "../../styledComponents/Button";
 
 function LenderPage() {
   const sampleData = {
@@ -236,7 +236,7 @@ function LenderPage() {
           ,
         </Col>
       </Row>
-      <ProceedButton />
+      <Button>Select and Proceed</Button>
     </Fragment>
   );
 }

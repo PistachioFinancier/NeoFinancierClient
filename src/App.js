@@ -60,8 +60,9 @@ function App() {
       </div>*/}
       {/* <RealnetMarketData /> */}
       {/* <LenderList></LenderList> */}
-      <LenderListSelect></LenderListSelect>
-      {/* <LenderPage /> */}
+      {/*<LenderListSelect></LenderListSelect>*/}
+      {/*<LenderPage />*/}
+      <Calculators />
     </div>
   );
 }
