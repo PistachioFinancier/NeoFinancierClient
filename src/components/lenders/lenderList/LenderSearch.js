@@ -26,10 +26,6 @@ function LenderSearch(props) {
     provinceOptions.push(<Option key={i}>{i}</Option>);
   }
 
-  function handleChangeTerritories(value) {
-    console.log(`selected ${value}`);
-  }
-
   // property types selector
   const propertyTypes = ["Retail", "Industrial", "Office"];
 
@@ -41,10 +37,6 @@ function LenderSearch(props) {
         {i}
       </Option>
     );
-  }
-
-  function handleChangePropertyType(e) {
-    props.setSelectedPropertyType(e);
   }
 
   // markets selector
@@ -60,35 +52,31 @@ function LenderSearch(props) {
     marketTypeOptions.push(<Option key={i}>{i}</Option>);
   }
 
-  function handleChangeMarkets(value) {
-    console.log(`selected ${value}`);
-  }
-
   return (
     <Fragment>
       <Title level={2}>Filter</Title>
       <Form>
         <Row>
-          <Col span={6}>
+          <Col span={4}>
             <Form.Item label="Property Type(s)">
               {getFieldDecorator("lenderName")(
                 <Select
                   mode="tags"
                   style={{ width: "100%" }}
-                  onChange={handleChangePropertyType}
+                  onChange={e => props.setSelectedPropertyType(e)}
                 >
                   {propertyTypeOptions}
                 </Select>
               )}
             </Form.Item>
           </Col>
-          <Col span={8}>
+          <Col span={6}>
             <Form.Item label="Markets">
               {getFieldDecorator("markets")(
                 <Select
                   mode="tags"
                   style={{ width: "100%" }}
-                  onChange={handleChangeMarkets}
+                  onChange={e => props.setSelectedMarkets(e)}
                 >
                   {marketTypeOptions}
                 </Select>
@@ -96,16 +84,26 @@ function LenderSearch(props) {
             </Form.Item>
           </Col>
 
-          <Col span={10}>
+          <Col span={8}>
             <Form.Item label="Territories">
               {getFieldDecorator("territories")(
                 <Select
                   mode="tags"
                   style={{ width: "100%" }}
-                  onChange={handleChangeTerritories}
+                  onChange={e => props.setSelectedTerritories(e)}
                 >
                   {provinceOptions}
                 </Select>
+              )}
+            </Form.Item>
+          </Col>
+          <Col span={6}>
+            <Form.Item label="Product Type">
+              {getFieldDecorator("productType")(
+                <Select
+                  style={{ width: "100%" }}
+                  onChange={e => props.setSelectedProductType(e)}
+                ></Select>
               )}
             </Form.Item>
           </Col>

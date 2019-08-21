@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Card, List, Button } from "antd";
+import { List } from "antd";
 
-//////// hide "show more" button if incoming data.length is less than 10
+import Card from "../../styledComponents/Card";
+import LenderCard from "./LenderCard";
 
 function LenderCategory(props) {
   const [collapsed, setCollapsed] = useState(true);
@@ -9,6 +10,11 @@ function LenderCategory(props) {
 
   useEffect(() => {
     populateCategories();
+    if (props.lenders.length > 10 && collapsed) {
+      setShowShowMoreButton(true);
+    } else {
+      setShowShowMoreButton(false);
+    }
   }, [collapsed, props]);
 
   const cards = [];
@@ -23,35 +29,45 @@ function LenderCategory(props) {
   const [showShowLessButton, setShowShowLessButton] = useState(false);
 
   function populateCategories() {
-    if (collapsed) {
-      let numLendersToShow = numberOfLenders < 10 ? numberOfLenders : 10;
-      for (let i = 0; i < numLendersToShow; i++) {
-        cards.push(
-          <Card
-            key={i}
-            bodyStyle={{ padding: 0, height: 25 }}
-            style={{ width: 250 }}
-            hoverable={true}
-          >
-            <List.Item.Meta
-              title={<a href="/">{props.lenders[i].companyName}</a>}
-            ></List.Item.Meta>
-          </Card>
-        );
+    if (props.selectable) {
+      if (collapsed) {
+        let numLendersToShow = numberOfLenders < 10 ? numberOfLenders : 10;
+        for (let i = 0; i < numLendersToShow; i++) {
+          cards.push(
+            <LenderCard key={i} lenders={props.lenders[i]}></LenderCard>
+          );
+        }
+      } else {
+        for (let i = 0; i < numberOfLenders; i++) {
+          cards.push(
+            <LenderCard key={i} lenders={props.lenders[i]}></LenderCard>
+          );
+        }
       }
     } else {
-      for (let i = 0; i < numberOfLenders; i++) {
-        cards.push(
-          <Card
-            bodyStyle={{ padding: 0, height: 25 }}
-            style={{ width: 250 }}
-            hoverable={true}
-          >
-            <List.Item.Meta
-              title={<a href="/">{props.lenders[i].companyName}</a>}
-            ></List.Item.Meta>
-          </Card>
-        );
+      if (collapsed) {
+        let numLendersToShow = numberOfLenders < 10 ? numberOfLenders : 10;
+        for (let i = 0; i < numLendersToShow; i++) {
+          cards.push(
+            <Card lenderselect="false" key={i} hoverable={true}>
+              <List.Item.Meta
+                title={<a href="/">{props.lenders[i].companyName}</a>}
+              ></List.Item.Meta>
+              <div style={{ color: "#4962F5" }}>{props.lenders[i].rating}</div>
+            </Card>
+          );
+        }
+      } else {
+        for (let i = 0; i < numberOfLenders; i++) {
+          cards.push(
+            <Card lenderselect="false" key={i} hoverable={true}>
+              <List.Item.Meta
+                title={<a href="/">{props.lenders[i].companyName}</a>}
+              ></List.Item.Meta>
+              {props.lenders[i].rating}
+            </Card>
+          );
+        }
       }
     }
     setCardsToDisplay(cards);
@@ -61,8 +77,10 @@ function LenderCategory(props) {
     <React.Fragment>
       <h2>{props.lenders[0] ? props.lenders[0].category : null}</h2>
       {cardsToDisplay}
-      {showShowMoreButton ? (
-        <Button
+      {showShowMoreButton && (
+        <Card
+          button="true"
+          hoverable={true}
           onClick={() => {
             setCollapsed(false);
             setShowShowMoreButton(false);
@@ -70,10 +88,12 @@ function LenderCategory(props) {
           }}
         >
           Show more
-        </Button>
-      ) : null}
-      {showShowLessButton ? (
-        <Button
+        </Card>
+      )}
+      {showShowLessButton && (
+        <Card
+          button="true"
+          hoverable={true}
           onClick={() => {
             setCollapsed(true);
             setShowShowMoreButton(true);
@@ -81,8 +101,8 @@ function LenderCategory(props) {
           }}
         >
           Show less
-        </Button>
-      ) : null}
+        </Card>
+      )}
     </React.Fragment>
   );
 }

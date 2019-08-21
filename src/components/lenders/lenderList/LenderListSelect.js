@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import LenderSearch from "./LenderSearch";
 import LenderCategories from "./LenderCategories";
+import DealDetailsBar from "./DealDetailsBar";
 import { Col, Row, Typography } from "antd";
 import { usePreventInitialUseEffect } from "../../../scripts/hooks/usePreventInitialUseEffect";
 
 import Input from "../../styledComponents/Input";
 
-function LenderList() {
+function LenderListSelect() {
   const sampleData = [
     {
       companyName: "Citibank",
@@ -592,7 +593,7 @@ function LenderList() {
   return (
     <React.Fragment>
       <Row>
-        <Title level={1}>Lenders</Title>
+        <Title level={1}>Pick Lenders</Title>
       </Row>
       <Row>
         <Col span={4}></Col>
@@ -603,6 +604,13 @@ function LenderList() {
             setSelectedTerritories={setSelectedTerritories}
             setSelectedProductType={setSelectedProductType}
           ></LenderSearch>
+        </Col>
+        <Col span={4}></Col>
+      </Row>
+      <Row>
+        <Col span={4}></Col>
+        <Col span={16}>
+          <DealDetailsBar></DealDetailsBar>
         </Col>
         <Col span={4}></Col>
       </Row>
@@ -619,7 +627,7 @@ function LenderList() {
           <LenderCategories
             lenders={data}
             categories={sampleLenderCategories}
-            selectable={false}
+            selectable={true}
           ></LenderCategories>
         </Col>
         <Col span={3}></Col>
@@ -628,4 +636,4 @@ function LenderList() {
   );
 }
 
-export default LenderList;
+export default LenderListSelect;

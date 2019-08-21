@@ -1,6 +1,6 @@
 import React from "react";
 import LenderCategory from "./LenderCategory";
-import { Col } from "antd";
+import { Col, Row } from "antd";
 
 function LenderCategories(props) {
   const listOfLendersPerCategoryCol1 = [];
@@ -15,6 +15,7 @@ function LenderCategories(props) {
     if (k === 0) {
       listOfLendersPerCategoryCol1.push(
         <LenderCategory
+          selectable={props.selectable}
           key={j++}
           lenders={props.lenders.filter(
             x => x.category === props.categories[i]
@@ -25,6 +26,7 @@ function LenderCategories(props) {
     } else if (k === 1) {
       listOfLendersPerCategoryCol2.push(
         <LenderCategory
+          selectable={props.selectable}
           key={j++}
           lenders={props.lenders.filter(
             x => x.category === props.categories[i]
@@ -35,6 +37,7 @@ function LenderCategories(props) {
     } else if (k === 2) {
       listOfLendersPerCategoryCol3.push(
         <LenderCategory
+          selectable={props.selectable}
           key={j++}
           lenders={props.lenders.filter(
             x => x.category === props.categories[i]
@@ -45,6 +48,7 @@ function LenderCategories(props) {
     } else if (k === 3) {
       listOfLendersPerCategoryCol4.push(
         <LenderCategory
+          selectable={props.selectable}
           key={j++}
           lenders={props.lenders.filter(
             x => x.category === props.categories[i]
@@ -56,12 +60,12 @@ function LenderCategories(props) {
   }
 
   return (
-    <React.Fragment>
+    <Row gutter={60}>
       <Col span={6}>{listOfLendersPerCategoryCol1}</Col>
       <Col span={6}>{listOfLendersPerCategoryCol2}</Col>
       <Col span={6}>{listOfLendersPerCategoryCol3}</Col>
       <Col span={6}>{listOfLendersPerCategoryCol4}</Col>
-    </React.Fragment>
+    </Row>
   );
 }
 
