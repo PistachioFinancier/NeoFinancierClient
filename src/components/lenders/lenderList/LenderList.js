@@ -547,8 +547,10 @@ function LenderList() {
     if (selectedMarkets.length === 0) {
       setData(sampleData);
     } else {
-      sampleData.filter(x =>
-        arrayContainsArray(x.propertyType, selectedMarkets)
+      setData(
+        sampleData.filter(x =>
+          arrayContainsArray(x.propertyType, selectedMarkets)
+        )
       );
     }
   };
@@ -557,8 +559,10 @@ function LenderList() {
     if (selectedTerritories.length === 0) {
       setData(sampleData);
     } else {
-      sampleData.filter(x =>
-        arrayContainsArray(x.propertyType, selectedTerritories)
+      setData(
+        sampleData.filter(x =>
+          arrayContainsArray(x.propertyType, selectedTerritories)
+        )
       );
     }
   };
@@ -567,8 +571,10 @@ function LenderList() {
     if (selectedProductType.length === 0) {
       setData(sampleData);
     } else {
-      sampleData.filter(x =>
-        arrayContainsArray(x.propertyType, selectedProductType)
+      setData(
+        sampleData.filter(x =>
+          arrayContainsArray(x.propertyType, selectedProductType)
+        )
       );
     }
   };
@@ -592,9 +598,17 @@ function LenderList() {
   return (
     <React.Fragment>
       <Row>
-        <Title level={1}>Lenders</Title>
+        <Title level={3}>Lenders</Title>
       </Row>
-      <Row>
+      <Row
+        style={{
+          backgroundColor: "rgba(0,0,0,0.06)",
+          boxShadow: "0 2px 9px 0 rgba(35,82,124,0.16)",
+          paddingTop: "50px",
+          height: "275px",
+          marginBottom: "50px"
+        }}
+      >
         <Col span={4}></Col>
         <Col span={16}>
           <LenderSearch
@@ -607,13 +621,14 @@ function LenderList() {
         <Col span={4}></Col>
       </Row>
       <Row>
-        <Col span={20}></Col>
+        <Col span={3}></Col>
+        <Col span={15}></Col>
         <Col span={3}>
           <Input onChange={handleFilterByName} placeholder="Filter by Name" />
         </Col>
         <Col span={3}></Col>
       </Row>
-      <Row>
+      <Row style={{ paddingBottom: "100px" }}>
         <Col span={3}></Col>
         <Col span={18}>
           <LenderCategories
@@ -622,6 +637,11 @@ function LenderList() {
             selectable={false}
           ></LenderCategories>
         </Col>
+        <Col span={3}></Col>
+      </Row>
+      <Row style={{ height: "200px" }}>
+        <Col span={3}></Col>
+        <Col span={18} style={{ borderTop: "2px solid #E8E9F1" }}></Col>
         <Col span={3}></Col>
       </Row>
     </React.Fragment>

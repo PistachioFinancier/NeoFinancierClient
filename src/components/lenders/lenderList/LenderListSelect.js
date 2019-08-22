@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import LenderSearch from "./LenderSearch";
 import LenderCategories from "./LenderCategories";
 import DealDetailsBar from "./DealDetailsBar";
-import { Col, Row, Typography } from "antd";
+import { Col, Row, Button, Typography } from "antd";
 import { usePreventInitialUseEffect } from "../../../scripts/hooks/usePreventInitialUseEffect";
 
 import Input from "../../styledComponents/Input";
@@ -522,7 +522,7 @@ function LenderListSelect() {
   const [selectedProductType, setSelectedProductType] = useState();
 
   // filtering functions
-  // "match all" functiona (as opposed to "match any"). Returns true if every element in the subset array is inlcuded in the superset array
+  // "match all" function (as opposed to "match any"). Returns true if every element in the subset array is inlcuded in the superset array
   function arrayContainsArray(superset, subset) {
     if (0 === subset.length) {
       return false;
@@ -548,8 +548,10 @@ function LenderListSelect() {
     if (selectedMarkets.length === 0) {
       setData(sampleData);
     } else {
-      sampleData.filter(x =>
-        arrayContainsArray(x.propertyType, selectedMarkets)
+      setData(
+        sampleData.filter(x =>
+          arrayContainsArray(x.propertyType, selectedMarkets)
+        )
       );
     }
   };
@@ -558,8 +560,10 @@ function LenderListSelect() {
     if (selectedTerritories.length === 0) {
       setData(sampleData);
     } else {
-      sampleData.filter(x =>
-        arrayContainsArray(x.propertyType, selectedTerritories)
+      setData(
+        sampleData.filter(x =>
+          arrayContainsArray(x.propertyType, selectedTerritories)
+        )
       );
     }
   };
@@ -568,8 +572,10 @@ function LenderListSelect() {
     if (selectedProductType.length === 0) {
       setData(sampleData);
     } else {
-      sampleData.filter(x =>
-        arrayContainsArray(x.propertyType, selectedProductType)
+      setData(
+        sampleData.filter(x =>
+          arrayContainsArray(x.propertyType, selectedProductType)
+        )
       );
     }
   };
@@ -593,9 +599,16 @@ function LenderListSelect() {
   return (
     <React.Fragment>
       <Row>
-        <Title level={1}>Pick Lenders</Title>
+        <Title level={3}>Pick Lenders</Title>
       </Row>
-      <Row>
+      <Row
+        style={{
+          backgroundColor: "rgba(0,0,0,0.06)",
+          boxShadow: "0 2px 9px 0 rgba(35,82,124,0.16)",
+          paddingTop: "50px",
+          height: "275px"
+        }}
+      >
         <Col span={4}></Col>
         <Col span={16}>
           <LenderSearch
@@ -607,7 +620,7 @@ function LenderListSelect() {
         </Col>
         <Col span={4}></Col>
       </Row>
-      <Row>
+      <Row style={{ margin: "50px 0" }}>
         <Col span={4}></Col>
         <Col span={16}>
           <DealDetailsBar></DealDetailsBar>
@@ -615,13 +628,14 @@ function LenderListSelect() {
         <Col span={4}></Col>
       </Row>
       <Row>
-        <Col span={20}></Col>
+        <Col span={3}></Col>
+        <Col span={15}></Col>
         <Col span={3}>
           <Input onChange={handleFilterByName} placeholder="Filter by Name" />
         </Col>
         <Col span={3}></Col>
       </Row>
-      <Row>
+      <Row style={{ paddingBottom: "100px" }}>
         <Col span={3}></Col>
         <Col span={18}>
           <LenderCategories
@@ -629,6 +643,37 @@ function LenderListSelect() {
             categories={sampleLenderCategories}
             selectable={true}
           ></LenderCategories>
+        </Col>
+        <Col span={3}></Col>
+      </Row>
+      <Row style={{ height: "200px" }}>
+        <Col span={3}></Col>
+        <Col span={18} style={{ borderTop: "2px solid #E8E9F1" }}>
+          <Row gutter={40} style={{ paddingTop: "30px" }}>
+            <Col span={18}></Col>
+            <Col span={3}>
+              <Button
+                style={{
+                  width: "100%",
+                  color: "#970000",
+                  backgroundColor: "#E0E0E0"
+                }}
+              >
+                Unselect All
+              </Button>
+            </Col>
+            <Col span={3}>
+              <Button
+                style={{
+                  width: "100%",
+                  backgroundColor: "#5e77ff",
+                  color: "white"
+                }}
+              >
+                Proceed
+              </Button>
+            </Col>
+          </Row>
         </Col>
         <Col span={3}></Col>
       </Row>

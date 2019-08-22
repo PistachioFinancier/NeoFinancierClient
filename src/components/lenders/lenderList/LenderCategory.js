@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { List } from "antd";
+import { List, Typography } from "antd";
 
 import Card from "../../styledComponents/Card";
 import LenderCard from "./LenderCard";
 
 function LenderCategory(props) {
+  const { Title } = Typography;
+
   const [collapsed, setCollapsed] = useState(true);
   const [cardsToDisplay, setCardsToDisplay] = useState();
 
@@ -51,7 +53,11 @@ function LenderCategory(props) {
           cards.push(
             <Card lenderselect="false" key={i} hoverable={true}>
               <List.Item.Meta
-                title={<a href="/">{props.lenders[i].companyName}</a>}
+                title={
+                  <a style={{ color: "#000000" }} href="/">
+                    {props.lenders[i].companyName}
+                  </a>
+                }
               ></List.Item.Meta>
               <div style={{ color: "#4962F5" }}>{props.lenders[i].rating}</div>
             </Card>
@@ -62,7 +68,11 @@ function LenderCategory(props) {
           cards.push(
             <Card lenderselect="false" key={i} hoverable={true}>
               <List.Item.Meta
-                title={<a href="/">{props.lenders[i].companyName}</a>}
+                title={
+                  <a style={{ color: "#000000" }} href="/">
+                    {props.lenders[i].companyName}
+                  </a>
+                }
               ></List.Item.Meta>
               {props.lenders[i].rating}
             </Card>
@@ -75,7 +85,9 @@ function LenderCategory(props) {
 
   return (
     <React.Fragment>
-      <h2>{props.lenders[0] ? props.lenders[0].category : null}</h2>
+      <Title level={4} style={{ padding: "30px 0 15px 0" }}>
+        {props.lenders[0] ? props.lenders[0].category : null}
+      </Title>
       {cardsToDisplay}
       {showShowMoreButton && (
         <Card

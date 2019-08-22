@@ -14,7 +14,7 @@ function PaymentAndAmortizationSchedule(props) {
   const [monthlyPayment, setMonthlyPayment] = useState();
   const [totalInterestPaidOverTerm, setTotalInterestPaidOverTerm] = useState();
   const [principleBalanceEndOfTerm, setPrincipleBalanceEndOfTerm] = useState();
-  const [scheduleSwitch, setScheduleSwitch] = useState(false);
+  // const [scheduleSwitch, setScheduleSwitch] = useState(false);
   const [schedule, setSchedule] = useState(null);
 
   const { getFieldDecorator } = props.form;
@@ -45,7 +45,7 @@ function PaymentAndAmortizationSchedule(props) {
   useEffect(() => {
     if (loanAmount && interestRate && term && amortization) {
       calculateAmortization();
-      setScheduleSwitch(true);
+      // setScheduleSwitch(true);
     }
   }, [loanAmount, interestRate, term, amortization, useUSSystem]);
 

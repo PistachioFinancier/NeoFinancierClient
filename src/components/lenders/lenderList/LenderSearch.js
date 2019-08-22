@@ -54,15 +54,14 @@ function LenderSearch(props) {
 
   return (
     <Fragment>
-      <Title level={2}>Filter</Title>
+      <Title level={4}>Filter</Title>
       <Form>
-        <Row>
+        <Row gutter={30}>
           <Col span={4}>
             <Form.Item label="Property Type(s)">
               {getFieldDecorator("lenderName")(
                 <Select
                   mode="tags"
-                  style={{ width: "100%" }}
                   onChange={e => props.setSelectedPropertyType(e)}
                 >
                   {propertyTypeOptions}
@@ -73,11 +72,7 @@ function LenderSearch(props) {
           <Col span={6}>
             <Form.Item label="Markets">
               {getFieldDecorator("markets")(
-                <Select
-                  mode="tags"
-                  style={{ width: "100%" }}
-                  onChange={e => props.setSelectedMarkets(e)}
-                >
+                <Select mode="tags" onChange={e => props.setSelectedMarkets(e)}>
                   {marketTypeOptions}
                 </Select>
               )}
@@ -89,7 +84,6 @@ function LenderSearch(props) {
               {getFieldDecorator("territories")(
                 <Select
                   mode="tags"
-                  style={{ width: "100%" }}
                   onChange={e => props.setSelectedTerritories(e)}
                 >
                   {provinceOptions}
@@ -101,7 +95,6 @@ function LenderSearch(props) {
             <Form.Item label="Product Type">
               {getFieldDecorator("productType")(
                 <Select
-                  style={{ width: "100%" }}
                   onChange={e => props.setSelectedProductType(e)}
                 ></Select>
               )}

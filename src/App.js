@@ -7,6 +7,7 @@ import RealnetMarketData from "./components/borrowers/RealnetMarketData";
 import LenderList from "./components/lenders/lenderList/LenderList";
 import LenderListSelect from "./components/lenders/lenderList/LenderListSelect";
 import LenderPage from "./components/lenders/lenderPage/LenderPage";
+import LoanExpiriesPerYearChart from "./components/borrowers/DashboardCharts/LoanExpiriesPerYearChart";
 
 function App() {
   const places = [
@@ -47,21 +48,22 @@ function App() {
   return (
     <div className="App">
       {/* <Calculators /> */}
-      {/*
-      <div>
+
+      {/* <div>
         <LenderMap
           provinces={["ON", "QC"]}
           center={{ lat: 52.8415678, lng: -95.153671399999993 }}
         />
-      </div>
-      */}
-      {/*<div>
+      </div> */}
+
+      {/* <div>
         <BorrowerMap places={places} />
-      </div>*/}
+      </div> */}
       {/* <RealnetMarketData /> */}
       {/* <LenderList></LenderList> */}
-      <LenderListSelect></LenderListSelect>
+      {/* <LenderListSelect></LenderListSelect> */}
       {/* <LenderPage /> */}
+      <LoanExpiriesPerYearChart></LoanExpiriesPerYearChart>
     </div>
   );
 }

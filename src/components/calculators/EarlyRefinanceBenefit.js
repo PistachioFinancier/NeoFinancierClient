@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import validation from "../../scripts/validation";
 import { amortSchedCA } from "../../scripts/amortCA";
-// import { amortSchedUS } from "../../scripts/AmortUS";
+import { amortSchedUS } from "../../scripts/amortUS";
 import {
   Row,
   Col,
@@ -68,12 +68,25 @@ function EarlyRefinanceBenefit(props) {
         : market_Date.getMonth() - start_Date.getMonth()) +
         (market_Date.getDate() >= start_Date.getDate() ? 1 : 0));
 
-    const schedule = amortSchedCA(
-      loanAmount,
-      interestRate,
-      term * 12,
-      amortization * 12
-    );
+    let schedule, savingSched, benefitsSched;
+
+    const populateVariables = func => {
+      schedule = func(loanAmount, interestRate, term * 12, amortization * 12);
+      savingSched = func(
+        loanAmountSavings,
+        interestRateSavings,
+        termSavings,
+        amortizationSavings * 12
+      );
+      benefitsSched = func(
+        loanAmountBenefits,
+        interestRateBenefits,
+        termBenefits * 12,
+        amortizationBenefits * 12
+      );
+    };
+
+    populateVariables(!useUSSystem ? amortSchedCA : amortSchedUS);
 
     setTermSavings(term * 12 - numberOfMonths);
     setLoanAmountSavings(schedule[numberOfMonths - 1]["principal remaining"]);
@@ -91,25 +104,11 @@ function EarlyRefinanceBenefit(props) {
 
     result = result + prepaymentPenalty;
 
-    const savingSched = amortSchedCA(
-      loanAmountSavings,
-      interestRateSavings,
-      termSavings,
-      amortizationSavings * 12
-    );
-
     setFinalSavings(
       interestRemaining -
         loanAmountSavings * (additionalFeesSavings / 100) -
         result -
         savingSched.slice(-1)[0]["accrued interest"]
-    );
-
-    const benefitsSched = amortSchedCA(
-      loanAmountBenefits,
-      interestRateBenefits,
-      termBenefits * 12,
-      amortizationBenefits * 12
     );
 
     setFinalBenefits(
