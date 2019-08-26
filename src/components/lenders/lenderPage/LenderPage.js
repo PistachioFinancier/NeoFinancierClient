@@ -1,5 +1,6 @@
 import React, { Fragment } from "react";
-import { Row, Col, Typography, Select, Table, Card } from "antd";
+import { Row, Col, Typography, Table, Tag } from "antd";
+import Card from "../../styledComponents/Card";
 import GeneralInfo from "./GeneralInfo";
 import OriginationsGraph from "./OriginationsGraph";
 import PortfolioMixGraph from "./PortfolioMixGraph";
@@ -196,9 +197,9 @@ function LenderPage() {
             <Text> Property Types: </Text>
           </Col>
           <Col span={12}>
-            <Select mode="tags" defaultValue={sampleData["Property Types"]}>
-              {/*sampleData["Property Types"].map(prop => <Option key = {prop}>{prop}</Option>)*/}
-            </Select>
+            {sampleData["Property Types"].map(type => (
+              <Tag>{type}</Tag>
+            ))}
           </Col>
         </Row>
       </div>
@@ -218,7 +219,10 @@ function LenderPage() {
       </Row>
       <Row type="flex" justify="center" align="middle">
         <Col span={24} style={{ "padding-bottom": "400px" }}>
-          <LenderMap provinces={sampleData.provinces}></LenderMap>
+          <LenderMap
+            provinces={sampleData.provinces}
+            center={{ lat: 54.418577, lng: -99.208536 }}
+          ></LenderMap>
         </Col>
       </Row>
       <Row>

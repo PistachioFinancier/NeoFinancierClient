@@ -61,8 +61,8 @@ function App() {
       {/* <RealnetMarketData /> */}
       {/* <LenderList></LenderList> */}
       {/*<LenderListSelect></LenderListSelect>*/}
-      {/*<LenderPage />*/}
-      <Calculators />
+      <LenderPage />
+      {/*<Calculators />*/}
     </div>
   );
 }
