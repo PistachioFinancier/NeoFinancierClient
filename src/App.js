@@ -8,6 +8,8 @@ import LenderList from "./components/lenders/lenderList/LenderList";
 import LenderListSelect from "./components/lenders/lenderList/LenderListSelect";
 import LenderPage from "./components/lenders/lenderPage/LenderPage";
 import LoanExpiriesPerYearChart from "./components/borrowers/DashboardCharts/LoanExpiriesPerYearChart";
+import PrincipalInterestChart from "./components/borrowers/DashboardCharts/PrincipalInterestChart";
+import LenderDiversificationChart from "./components/borrowers/DashboardCharts/LenderDiversificationChart";
 
 function App() {
   const places = [
@@ -63,7 +65,9 @@ function App() {
       {/* <LenderList></LenderList> */}
       {/* <LenderListSelect></LenderListSelect> */}
       {/* <LenderPage /> */}
-      <LoanExpiriesPerYearChart></LoanExpiriesPerYearChart>
+      {/* <LoanExpiriesPerYearChart></LoanExpiriesPerYearChart> */}
+      {/* <PrincipalInterestChart></PrincipalInterestChart> */}
+      <LenderDiversificationChart></LenderDiversificationChart>
     </div>
   );
 }

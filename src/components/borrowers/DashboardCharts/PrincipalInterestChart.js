@@ -1,10 +1,8 @@
-import React, { useState, Fragment } from "react";
+import React, { Fragment, useReducer } from "react";
 import { Bar } from "react-chartjs-2";
 import { amortSchedCA } from "../../../scripts/amortCA";
-import addMonths from "date-fns/addMonths";
-import { Modal, Table } from "antd";
 
-function LoanExpiriesPerYearChart() {
+function retrieveAndParseData() {
   const sampleData = [
     {
       id: 433,
@@ -1496,218 +1494,268 @@ function LoanExpiriesPerYearChart() {
     }
   ];
 
-  const [chartState, setChartState] = useState(0); // 0 is default chart state, 1 is zoomed chart state
-
-  const currentYear = new Date().getFullYear();
-
   const parsedDataArray = sampleData.map(loan => ({
-    principalRemaingAtEndOfTerm:
-      amortSchedCA(
-        Number(loan.Original_Loan_Amount),
-        Number(loan.Fixed_Rate) || Number(loan.Variable_Spread),
-        loan.Term,
-        loan.Amortization
-      )[loan.Term - 1]["principal remaining"] || 0,
-    expiryDate: addMonths(new Date(loan.First_Payment_Date), loan.Term), // TODO: make this work correctly on edge cases!! (august 31 plus 1 month should be sep 30 !!!!!),
-    expiryDateString: addMonths(new Date(loan.First_Payment_Date), loan.Term)
-      .toISOString()
-      .slice(0, 10),
-    address: loan.Address,
-    lender: loan.Lender,
-    loanAmount: Math.round(loan.Original_Loan_Amount),
+    amount: loan.Original_Loan_Amount,
     interestRate: loan.Fixed_Rate || loan.Variable_Spread,
-    LTV:
-      Math.round(
-        (loan.Original_Loan_Amount / loan.Recent_Appraisal_Value) * 100
-      ) / 100,
-    DSCR:
-      Math.round(
-        (loan.Internal_Valuation_NOI / loan.Original_Loan_Amount) * 100
-      ) / 100,
-    propertyValue: Math.round(loan.Recent_Appraisal_Value)
+    term: loan.Term,
+    amortization: loan.Amortization,
+    startDate: new Date(loan.First_Payment_Date)
   }));
 
-  const totalNumYearsForChart = 10;
+  return parsedDataArray;
+}
 
-  const years = [];
+function mainCalculation() {
+  const parsedDataArray = retrieveAndParseData();
 
-  for (
-    let i = currentYear - totalNumYearsForChart / 2;
-    i < currentYear + totalNumYearsForChart / 2;
-    i++
-  ) {
-    years.push(i);
+  // create blank object that will get populated with data
+  const dataObject = {};
+  for (let i = 0; i < 120; i++) {
+    dataObject[i] = {
+      principalPaid: 0,
+      interestPaid: 0,
+      avgInterestRateAcc: 0
+    };
   }
-
-  const [labelsForChart, setLabelsForChart] = useState(years);
-
-  const numPropertiesExpiringPerYear = Array(totalNumYearsForChart).fill(0);
-  const totalPrincipalRemainingPerYear = Array(totalNumYearsForChart).fill(0);
-
+  // loop through data and add amount to principal or interest paid
   parsedDataArray.forEach(loan => {
-    if (years.includes(loan.expiryDate.getFullYear())) {
-      numPropertiesExpiringPerYear[
-        years.indexOf(loan.expiryDate.getFullYear())
-      ]++;
-      totalPrincipalRemainingPerYear[
-        years.indexOf(loan.expiryDate.getFullYear())
-      ] += loan.principalRemaingAtEndOfTerm;
+    const amortSchedule = amortSchedCA(
+      loan.amount,
+      loan.interestRate,
+      loan.term,
+      loan.amortization
+    );
+
+    const firstPaymentIndex =
+      (loan.startDate.getFullYear() - years[0]) * 12 +
+      loan.startDate.getMonth(); // firstPaymentIndex will be >0 if startDate is within our 10-year period
+
+    for (let i = 0; i < loan.term; i++) {
+      if (firstPaymentIndex >= 0 && dataObject[`${firstPaymentIndex + i}`]) {
+        dataObject[`${firstPaymentIndex + i}`].principalPaid +=
+          amortSchedule[i].principal;
+        dataObject[`${firstPaymentIndex + i}`].interestPaid +=
+          amortSchedule[i].interest;
+        dataObject[`${firstPaymentIndex + i}`].avgInterestRateAcc +=
+          amortSchedule[i].interest * loan.interestRate;
+      } else if (
+        firstPaymentIndex < 0 &&
+        amortSchedule[-firstPaymentIndex + i]
+      ) {
+        dataObject[`${i}`].principalPaid +=
+          amortSchedule[-firstPaymentIndex + i].principal;
+        dataObject[`${i}`].interestPaid +=
+          amortSchedule[-firstPaymentIndex + i].interest;
+        dataObject[`${i}`].avgInterestRateAcc +=
+          amortSchedule[i].interest * loan.interestRate;
+      }
     }
   });
 
-  const defaultDatasetForChart = [
+  return { dataObject };
+}
+
+function populateArraysForAvgInterestRateDefault() {
+  const { dataObject } = mainCalculation();
+
+  let defaultDatasetForAvgInterestRatePerYear = Array(
+    totalNumYearsForChart
+  ).fill(0);
+  let totalInterestPaidPerYear = Array(totalNumYearsForChart).fill(0);
+
+  for (let i = 0; i < totalNumYearsForChart; i++) {
+    for (let j = 0; j < 12; j++) {
+      defaultDatasetForAvgInterestRatePerYear[i] +=
+        dataObject[`${i * 12 + j}`].avgInterestRateAcc;
+      totalInterestPaidPerYear[i] += dataObject[`${i * 12 + j}`].interestPaid;
+    }
+    defaultDatasetForAvgInterestRatePerYear[i] =
+      defaultDatasetForAvgInterestRatePerYear[i] / totalInterestPaidPerYear[i];
+  }
+
+  return defaultDatasetForAvgInterestRatePerYear;
+}
+
+function populateArraysForAvgInterestRateZoomed(yearIndex) {
+  const { dataObject } = mainCalculation();
+
+  let datasetForChartZoomedAvgInterestRate = Array(12).fill(0);
+  let indexOfStartOfSelectedYear = yearIndex * 12;
+
+  for (let i = 0; i < 12; i++) {
+    datasetForChartZoomedAvgInterestRate[i] =
+      dataObject[`${indexOfStartOfSelectedYear + i}`].avgInterestRateAcc /
+      dataObject[`${indexOfStartOfSelectedYear + i}`].interestPaid;
+  }
+
+  return datasetForChartZoomedAvgInterestRate;
+}
+
+function populateArraysForChartDefault() {
+  const { dataObject } = mainCalculation();
+  // blank arrays for chart
+  let defaultDatasetForChartPrincipal = Array(totalNumYearsForChart).fill(0);
+  let defaultDatasetForChartInterest = Array(totalNumYearsForChart).fill(0);
+
+  // populate blank arrays
+  for (let i = 0; i < totalNumYearsForChart; i++) {
+    for (let j = 0; j < 12; j++) {
+      defaultDatasetForChartPrincipal[i] +=
+        dataObject[`${i * 12 + j}`].principalPaid;
+      defaultDatasetForChartInterest[i] +=
+        dataObject[`${i * 12 + j}`].interestPaid;
+    }
+  }
+  return [
     {
-      label: "$",
-      data: totalPrincipalRemainingPerYear,
+      label: "Principal",
+      data: defaultDatasetForChartPrincipal,
       backgroundColor: "rgba(255, 99, 132, 0.5)",
       yAxisID: "1"
     },
     {
-      label: "# Properties",
-      data: numPropertiesExpiringPerYear,
+      label: "Interest",
+      data: defaultDatasetForChartInterest,
       backgroundColor: "rgba(255, 206, 86, 0.5)",
-      yAxisID: "2"
+      yAxisID: "1"
+    },
+    {
+      label: "Average Interest Rate Weighted",
+      data: populateArraysForAvgInterestRateDefault(),
+      type: "line",
+      fill: false,
+      showLine: false,
+      yAxisID: "2",
+      backgroundColor: "rgba(54,162,235, 0.8)",
+      pointBackgroundColor: "rgba(54,162,235, 0.8)",
+      pointBorderColor: "rgba(54,162,235, 0.8)"
     }
   ];
+}
 
-  const [datasetForChart, setDatasetForChart] = useState(
-    defaultDatasetForChart
-  );
+function populateArraysForChartsZoomed(yearIndex) {
+  const { dataObject } = mainCalculation();
+
+  // blank array for chart
+  let datasetForChartZoomPrincipal = Array(12).fill(0);
+  let datasetForChartZoomInterest = Array(12).fill(0);
+  let indexOfStartOfSelectedYear = yearIndex * 12;
+
+  for (let i = 0; i < 12; i++) {
+    datasetForChartZoomPrincipal[i] +=
+      dataObject[`${indexOfStartOfSelectedYear + i}`].principalPaid;
+    datasetForChartZoomInterest[i] +=
+      dataObject[`${indexOfStartOfSelectedYear + i}`].interestPaid;
+  }
+
+  return [
+    {
+      label: "Principal",
+      data: datasetForChartZoomPrincipal,
+      backgroundColor: "rgba(255, 99, 132, 0.5)"
+    },
+    {
+      label: "Interest",
+      data: datasetForChartZoomInterest,
+      backgroundColor: "rgba(255, 206, 86, 0.5)"
+    },
+    {
+      label: "Average Interest Rate Weighted",
+      data: populateArraysForAvgInterestRateZoomed(yearIndex),
+      type: "line",
+      fill: false,
+      showLine: false,
+      yAxisID: "2",
+      backgroundColor: "rgba(54,162,235, 0.8)",
+      pointBackgroundColor: "rgba(54,162,235, 0.8)",
+      pointBorderColor: "rgba(54,162,235, 0.8)"
+    }
+  ];
+}
+
+const currentYear = new Date().getFullYear();
+const totalNumYearsForChart = 10;
+
+// create years array
+const years = [];
+for (
+  let i = currentYear - totalNumYearsForChart / 2;
+  i < currentYear + totalNumYearsForChart / 2;
+  i++
+) {
+  years.push(i);
+}
+
+const monthsText = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec"
+];
+
+function userActionReducer(state, action) {
+  switch (action.type) {
+    case "ZOOM": {
+      return {
+        ...state,
+        zoomPrincipal: true,
+        labelsForChart: monthsText,
+        datasetForChart: populateArraysForChartsZoomed(action.payload)
+      };
+    }
+    case "RETURN": {
+      return {
+        ...state,
+        zoomPrincipal: false,
+        zoomInterest: false,
+        labelsForChart: years,
+        datasetForChart: populateArraysForChartDefault()
+      };
+    }
+    default: {
+      return state;
+    }
+  }
+}
+
+function PrincipalInterestChart() {
+  const initialState = {
+    zoomPrincipal: false,
+    zoomInterest: false,
+    labelsForChart: years,
+    datasetForChart: populateArraysForChartDefault()
+  };
+  const [state, dispatch] = useReducer(userActionReducer, initialState);
+  const {
+    zoomPrincipal,
+    zoomInterest,
+    labelsForChart,
+    datasetForChart
+  } = state;
 
   function handleClick(e) {
-    if (chartState === 0) {
-      setChartState(1);
+    if (!zoomPrincipal && !zoomInterest) {
       if (e[0] === undefined) {
-      } else if (e[0]._datasetIndex === 0) {
-        // user clicked $
-        updateDatasetForChart(e);
-      } else {
-        // user clicked #
-        setModalVisibility(true);
-        updateDatasetForTable(e);
+      } else if (e[0]._datasetIndex === 0 || e[0]._datasetIndex === 1) {
+        dispatch({
+          type: "ZOOM",
+          payload: e[0]._index
+        });
       }
     } else {
-      setDatasetForChart(defaultDatasetForChart);
-      setLabelsForChart(years);
-      setChartState(0);
-    }
-  }
-
-  // update hooks to be used for chart
-  function updateDatasetForChart(e) {
-    const monthsNum = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-
-    const monthsText = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec"
-    ];
-
-    const numPropertiesExpiringPerMonth = new Array(12).fill(0);
-    const totalPrincipalRemainingPerMonth = new Array(12).fill(0);
-
-    parsedDataArray
-      .filter(loan => loan.expiryDate.getFullYear() === years[e[0]._index])
-      .forEach(loan => {
-        if (monthsNum.includes(loan.expiryDate.getMonth())) {
-          numPropertiesExpiringPerMonth[
-            monthsNum.indexOf(loan.expiryDate.getMonth())
-          ]++;
-          totalPrincipalRemainingPerMonth[
-            monthsNum.indexOf(loan.expiryDate.getMonth())
-          ] += loan.principalRemaingAtEndOfTerm;
-        }
+      dispatch({
+        type: "RETURN"
       });
-
-    setLabelsForChart(monthsText);
-    setDatasetForChart([
-      {
-        label: "$",
-        data: totalPrincipalRemainingPerMonth,
-        backgroundColor: "rgba(255, 99, 132, 0.5)",
-        yAxisID: "1"
-      },
-      {
-        label: "# Properties",
-        data: numPropertiesExpiringPerMonth,
-        backgroundColor: "rgba(255, 206, 86, 0.5)",
-        yAxisID: "2"
-      }
-    ]);
-  }
-
-  const [dataSourceForTable, setDataSourceForTable] = useState([]);
-
-  // update hooks to be used for table
-  function updateDatasetForTable(e) {
-    const dataForTable = parsedDataArray.filter(
-      loan => loan.expiryDate.getFullYear() === years[e[0]._index]
-    );
-
-    let x = 0;
-
-    setDataSourceForTable(
-      dataForTable.map(loan => ({
-        key: x++,
-        ...loan
-      }))
-    );
-  }
-
-  // parameters for table and modal
-  const [modalVisibility, setModalVisibility] = useState(false);
-
-  const columnsForTable = [
-    {
-      title: "Address",
-      dataIndex: "address",
-      key: "address"
-    },
-    {
-      title: "Lender",
-      dataIndex: "lender",
-      key: "lender"
-    },
-    {
-      title: "Loan Amount",
-      dataIndex: "loanAmount",
-      key: "loanAmount"
-    },
-    {
-      title: "Expiry Date",
-      dataIndex: "expiryDateString",
-      key: "expiryDateString"
-    },
-    {
-      title: "Interest Rate",
-      dataIndex: "interestRate",
-      key: "interestRate"
-    },
-    {
-      title: "LTV",
-      dataIndex: "LTV",
-      key: "LTV"
-    },
-    {
-      title: "DSCR",
-      dataIndex: "DSCR",
-      key: "DSCR"
-    },
-    {
-      title: "Property Value",
-      dataIndex: "propertyValue",
-      key: "propertyValue"
     }
-  ];
+  }
 
   // parameters for chart
   const data = {
@@ -1720,7 +1768,8 @@ function LoanExpiriesPerYearChart() {
     scales: {
       xAxes: [
         {
-          barPercentage: 0.4
+          barPercentage: 0.4,
+          stacked: true
         }
       ],
       yAxes: [
@@ -1729,7 +1778,8 @@ function LoanExpiriesPerYearChart() {
           position: "left",
           ticks: {
             beginAtZero: true
-          }
+          },
+          stacked: true
         },
         {
           id: "2",
@@ -1742,6 +1792,8 @@ function LoanExpiriesPerYearChart() {
     }
   };
 
+  //   populateArraysForAvgInterestRateZoomed();
+
   return (
     <Fragment>
       <Bar
@@ -1751,17 +1803,8 @@ function LoanExpiriesPerYearChart() {
         height={500}
         options={options}
       />
-      <Modal
-        title="Loans"
-        footer={null}
-        visible={modalVisibility}
-        onCancel={() => setModalVisibility(false)}
-        width="auto"
-      >
-        <Table dataSource={dataSourceForTable} columns={columnsForTable} />
-      </Modal>
     </Fragment>
   );
 }
 
-export default LoanExpiriesPerYearChart;
+export default PrincipalInterestChart;

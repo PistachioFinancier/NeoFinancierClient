@@ -14,7 +14,6 @@ function RealnetMarketData() {
 
   useEffect(() => {
     if (parsedRealnetData) {
-      console.log(parsedRealnetData);
       filterDataByPropertyType();
     }
   }, [parsedRealnetData]);

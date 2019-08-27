@@ -1,10 +1,8 @@
-import React, { useState, Fragment } from "react";
-import { Bar } from "react-chartjs-2";
-import { amortSchedCA } from "../../../scripts/amortCA";
+import React from "react";
+import LenderDiversificationPieChart from "./LenderDiversificationPieChart";
 import addMonths from "date-fns/addMonths";
-import { Modal, Table } from "antd";
 
-function LoanExpiriesPerYearChart() {
+function retrieveAndParseData() {
   const sampleData = [
     {
       id: 433,
@@ -1496,18 +1494,8 @@ function LoanExpiriesPerYearChart() {
     }
   ];
 
-  const [chartState, setChartState] = useState(0); // 0 is default chart state, 1 is zoomed chart state
-
-  const currentYear = new Date().getFullYear();
-
   const parsedDataArray = sampleData.map(loan => ({
-    principalRemaingAtEndOfTerm:
-      amortSchedCA(
-        Number(loan.Original_Loan_Amount),
-        Number(loan.Fixed_Rate) || Number(loan.Variable_Spread),
-        loan.Term,
-        loan.Amortization
-      )[loan.Term - 1]["principal remaining"] || 0,
+    lenderClassification: loan.Lender_Classification,
     expiryDate: addMonths(new Date(loan.First_Payment_Date), loan.Term), // TODO: make this work correctly on edge cases!! (august 31 plus 1 month should be sep 30 !!!!!),
     expiryDateString: addMonths(new Date(loan.First_Payment_Date), loan.Term)
       .toISOString()
@@ -1527,241 +1515,51 @@ function LoanExpiriesPerYearChart() {
     propertyValue: Math.round(loan.Recent_Appraisal_Value)
   }));
 
-  const totalNumYearsForChart = 10;
+  return parsedDataArray;
+}
 
-  const years = [];
+function createPieChartData() {
+  const parsedDataArray = retrieveAndParseData();
 
-  for (
-    let i = currentYear - totalNumYearsForChart / 2;
-    i < currentYear + totalNumYearsForChart / 2;
-    i++
-  ) {
-    years.push(i);
-  }
+  const totalLoans = parsedDataArray.reduce((total, loan) => {
+    return total + Number(loan.loanAmount);
+  }, 0);
 
-  const [labelsForChart, setLabelsForChart] = useState(years);
-
-  const numPropertiesExpiringPerYear = Array(totalNumYearsForChart).fill(0);
-  const totalPrincipalRemainingPerYear = Array(totalNumYearsForChart).fill(0);
+  const dataObject = {};
 
   parsedDataArray.forEach(loan => {
-    if (years.includes(loan.expiryDate.getFullYear())) {
-      numPropertiesExpiringPerYear[
-        years.indexOf(loan.expiryDate.getFullYear())
-      ]++;
-      totalPrincipalRemainingPerYear[
-        years.indexOf(loan.expiryDate.getFullYear())
-      ] += loan.principalRemaingAtEndOfTerm;
+    if (!dataObject[`${loan.lenderClassification}`]) {
+      dataObject[`${loan.lenderClassification}`] = [loan];
+    } else {
+      dataObject[`${loan.lenderClassification}`].push(loan);
     }
   });
 
-  const defaultDatasetForChart = [
-    {
-      label: "$",
-      data: totalPrincipalRemainingPerYear,
-      backgroundColor: "rgba(255, 99, 132, 0.5)",
-      yAxisID: "1"
-    },
-    {
-      label: "# Properties",
-      data: numPropertiesExpiringPerYear,
-      backgroundColor: "rgba(255, 206, 86, 0.5)",
-      yAxisID: "2"
-    }
-  ];
+  const result = [];
 
-  const [datasetForChart, setDatasetForChart] = useState(
-    defaultDatasetForChart
-  );
-
-  function handleClick(e) {
-    if (chartState === 0) {
-      setChartState(1);
-      if (e[0] === undefined) {
-      } else if (e[0]._datasetIndex === 0) {
-        // user clicked $
-        updateDatasetForChart(e);
-      } else {
-        // user clicked #
-        setModalVisibility(true);
-        updateDatasetForTable(e);
-      }
-    } else {
-      setDatasetForChart(defaultDatasetForChart);
-      setLabelsForChart(years);
-      setChartState(0);
-    }
+  for (let i of Object.keys(dataObject)) {
+    result.push({
+      y: Math.round(
+        (dataObject[i].reduce((total, loan) => {
+          return total + Number(loan.loanAmount);
+        }, 0) /
+          totalLoans) *
+          100
+      ),
+      label: i
+    });
   }
 
-  // update hooks to be used for chart
-  function updateDatasetForChart(e) {
-    const monthsNum = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+  return result;
+}
 
-    const monthsText = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec"
-    ];
-
-    const numPropertiesExpiringPerMonth = new Array(12).fill(0);
-    const totalPrincipalRemainingPerMonth = new Array(12).fill(0);
-
-    parsedDataArray
-      .filter(loan => loan.expiryDate.getFullYear() === years[e[0]._index])
-      .forEach(loan => {
-        if (monthsNum.includes(loan.expiryDate.getMonth())) {
-          numPropertiesExpiringPerMonth[
-            monthsNum.indexOf(loan.expiryDate.getMonth())
-          ]++;
-          totalPrincipalRemainingPerMonth[
-            monthsNum.indexOf(loan.expiryDate.getMonth())
-          ] += loan.principalRemaingAtEndOfTerm;
-        }
-      });
-
-    setLabelsForChart(monthsText);
-    setDatasetForChart([
-      {
-        label: "$",
-        data: totalPrincipalRemainingPerMonth,
-        backgroundColor: "rgba(255, 99, 132, 0.5)",
-        yAxisID: "1"
-      },
-      {
-        label: "# Properties",
-        data: numPropertiesExpiringPerMonth,
-        backgroundColor: "rgba(255, 206, 86, 0.5)",
-        yAxisID: "2"
-      }
-    ]);
-  }
-
-  const [dataSourceForTable, setDataSourceForTable] = useState([]);
-
-  // update hooks to be used for table
-  function updateDatasetForTable(e) {
-    const dataForTable = parsedDataArray.filter(
-      loan => loan.expiryDate.getFullYear() === years[e[0]._index]
-    );
-
-    let x = 0;
-
-    setDataSourceForTable(
-      dataForTable.map(loan => ({
-        key: x++,
-        ...loan
-      }))
-    );
-  }
-
-  // parameters for table and modal
-  const [modalVisibility, setModalVisibility] = useState(false);
-
-  const columnsForTable = [
-    {
-      title: "Address",
-      dataIndex: "address",
-      key: "address"
-    },
-    {
-      title: "Lender",
-      dataIndex: "lender",
-      key: "lender"
-    },
-    {
-      title: "Loan Amount",
-      dataIndex: "loanAmount",
-      key: "loanAmount"
-    },
-    {
-      title: "Expiry Date",
-      dataIndex: "expiryDateString",
-      key: "expiryDateString"
-    },
-    {
-      title: "Interest Rate",
-      dataIndex: "interestRate",
-      key: "interestRate"
-    },
-    {
-      title: "LTV",
-      dataIndex: "LTV",
-      key: "LTV"
-    },
-    {
-      title: "DSCR",
-      dataIndex: "DSCR",
-      key: "DSCR"
-    },
-    {
-      title: "Property Value",
-      dataIndex: "propertyValue",
-      key: "propertyValue"
-    }
-  ];
-
-  // parameters for chart
-  const data = {
-    labels: labelsForChart,
-    datasets: datasetForChart
-  };
-
-  const options = {
-    responsive: true,
-    scales: {
-      xAxes: [
-        {
-          barPercentage: 0.4
-        }
-      ],
-      yAxes: [
-        {
-          id: "1",
-          position: "left",
-          ticks: {
-            beginAtZero: true
-          }
-        },
-        {
-          id: "2",
-          position: "right",
-          ticks: {
-            beginAtZero: true
-          }
-        }
-      ]
-    }
-  };
-
+function LenderDiversificationChart() {
   return (
-    <Fragment>
-      <Bar
-        data={data}
-        width={2000}
-        getElementAtEvent={e => handleClick(e)}
-        height={500}
-        options={options}
-      />
-      <Modal
-        title="Loans"
-        footer={null}
-        visible={modalVisibility}
-        onCancel={() => setModalVisibility(false)}
-        width="auto"
-      >
-        <Table dataSource={dataSourceForTable} columns={columnsForTable} />
-      </Modal>
-    </Fragment>
+    <LenderDiversificationPieChart
+      pieChartData={createPieChartData()}
+      tableData={retrieveAndParseData()}
+    ></LenderDiversificationPieChart>
   );
 }
 
-export default LoanExpiriesPerYearChart;
+export default LenderDiversificationChart;
