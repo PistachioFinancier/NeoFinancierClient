@@ -7,6 +7,7 @@ import RealnetMarketData from "./components/borrowers/RealnetMarketData";
 import LenderList from "./components/lenders/lenderList/LenderList";
 import LenderListSelect from "./components/lenders/lenderList/LenderListSelect";
 import LenderPage from "./components/lenders/lenderPage/LenderPage";
+import Services from "./components/services-pages/example";
 
 function App() {
   const places = [
@@ -61,8 +62,9 @@ function App() {
       {/* <RealnetMarketData /> */}
       {/* <LenderList></LenderList> */}
       {/*<LenderListSelect></LenderListSelect>*/}
-      <LenderPage />
+      {/*<LenderPage />*/}
       {/*<Calculators />*/}
+      <Services />
     </div>
   );
 }
