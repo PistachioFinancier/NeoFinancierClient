@@ -17,8 +17,7 @@ function LenderDiversificationPieChart(props) {
       case "RETURN": {
         return {
           ...state,
-          showModal: false,
-          datasetForTable: null
+          showModal: false
         };
       }
       default: {
