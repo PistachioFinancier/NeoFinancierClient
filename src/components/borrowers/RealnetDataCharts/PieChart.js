@@ -9,7 +9,7 @@ function PieChart(props) {
   const [tableData, setTableData] = useState(null);
 
   const dollarToValue = dollar => {
-    return Number(dollar.replace(/[^0-9.-]+/g, ""));
+    return dollar ? Number(dollar.replace(/[^0-9.-]+/g, "")) : 0;
   };
 
   const valueToDollar = value => {
