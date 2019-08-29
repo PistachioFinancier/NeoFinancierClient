@@ -3,7 +3,7 @@ import "antd/dist/antd.css";
 import Calculators from "./components/calculators/Calculators";
 import LenderMap from "./components/lenders/lenderPage/LenderMap";
 import BorrowerMap from "./components/borrowers/BorrowerMap";
-import RealnetMarketData from "./components/borrowers/RealnetMarketData";
+import RealnetMarketData from "./components/borrowers/RealnetDataCharts/RealnetMarketData";
 import LenderList from "./components/lenders/lenderList/LenderList";
 import LenderListSelect from "./components/lenders/lenderList/LenderListSelect";
 import LenderPage from "./components/lenders/lenderPage/LenderPage";
@@ -59,11 +59,11 @@ function App() {
       {/* <div>
         <BorrowerMap places={places} />
       </div> */}
-      {/* <RealnetMarketData /> */}
+      <RealnetMarketData />
       {/* <LenderList></LenderList> */}
       {/* <LenderListSelect></LenderListSelect> */}
       {/* <LenderPage /> */}
-      <DashboardCharts></DashboardCharts>
+      {/* <DashboardCharts></DashboardCharts> */}
     </div>
   );
 }

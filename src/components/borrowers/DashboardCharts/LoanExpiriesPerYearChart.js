@@ -1,7 +1,5 @@
-import React, { useState, Fragment, useReducer } from "react";
+import React, { Fragment, useReducer } from "react";
 import { Bar } from "react-chartjs-2";
-import { amortSchedCA } from "../../../scripts/amortCA";
-import addMonths from "date-fns/addMonths";
 import { Modal, Table } from "antd";
 
 function LoanExpiriesPerYearChart(props) {
@@ -24,24 +22,57 @@ function LoanExpiriesPerYearChart(props) {
     zoomNumber: false,
     labelsForChart: years,
     datasetForChart: populateArraysForChartDefault(),
-    showModal: false
+    showModal: false,
+    datasetForTable: []
   };
   const [state, dispatch] = useReducer(userActionReducer, initialState);
-  const { zoomDollar, zoomNumber, labelsForChart, datasetForChart } = state;
+  const {
+    zoomDollar,
+    zoomNumber,
+    labelsForChart,
+    datasetForChart,
+    showModal,
+    datasetForTable
+  } = state;
 
   function userActionReducer(state, action) {
+    const monthsText = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec"
+    ];
     switch (action.type) {
       case "ZOOM_DOLLAR": {
         return {
           ...state,
-          zoomDollar: true
+          zoomDollar: true,
+          labelsForChart: monthsText,
+          datasetForChart: populateArraysForChartZoomedDollar(action.payload)
         };
       }
       case "ZOOM_NUMBER": {
         return {
           ...state,
           zoomNumber: true,
-          showModal: true
+          showModal: true,
+          datasetForTable: populateDatasetForTable(action.payload)
+        };
+      }
+      case "ZOOM_NUMBER_MONTH": {
+        return {
+          ...state,
+          zoomNumber: true,
+          showModal: true,
+          datasetForTable: populateDatasetForTableMonth(action.payload)
         };
       }
       case "RETURN": {
@@ -49,7 +80,9 @@ function LoanExpiriesPerYearChart(props) {
           ...state,
           zoomDollar: false,
           zoomNumber: false,
-          showModal: false
+          showModal: false,
+          labelsForChart: years,
+          datasetForChart: populateArraysForChartDefault()
         };
       }
       default: {
@@ -103,42 +136,75 @@ function LoanExpiriesPerYearChart(props) {
       }
     }
 
-    return {
-      labels: years,
-      datasets: [
-        {
-          label: "Total $",
-          data: totalPrincipalRemainingPerYear,
-          backgroundColor: "rgba(255, 99, 132, 0.5)",
-          yAxisID: "1"
-        },
-        {
-          label: "# Properties",
-          data: numPropertiesExpiringPerYear,
-          backgroundColor: "rgba(255, 206, 86, 0.5)",
-          yAxisID: "2"
-        }
-      ]
-    };
+    return [
+      {
+        label: "Total $",
+        data: totalPrincipalRemainingPerYear,
+        backgroundColor: "rgba(255, 99, 132, 0.5)",
+        yAxisID: "1"
+      },
+      {
+        label: "# Properties",
+        data: numPropertiesExpiringPerYear,
+        backgroundColor: "rgba(255, 206, 86, 0.5)",
+        yAxisID: "2"
+      }
+    ];
   }
 
-  function populateArraysForChartZoomedDollar(){
-    
+  function populateArraysForChartZoomedDollar(year) {
+    const { dataObject } = mainCalculation();
+
+    const totalPrincipalRemainingPerMonth = Array(12);
+    const numPropertiesExpiringPerMonth = Array(12);
+
+    for (let i = 0; i < 12; i++) {
+      totalPrincipalRemainingPerMonth[i] =
+        dataObject[i + year * 12].loanExpiriesDollar;
+      numPropertiesExpiringPerMonth[i] =
+        dataObject[i + year * 12].loanExpiriesNumber;
+    }
+
+    return [
+      {
+        label: "Total $",
+        data: totalPrincipalRemainingPerMonth,
+        backgroundColor: "rgba(255, 99, 132, 0.5)",
+        yAxisID: "1"
+      },
+      {
+        label: "# Properties",
+        data: numPropertiesExpiringPerMonth,
+        backgroundColor: "rgba(255, 206, 86, 0.5)",
+        yAxisID: "2"
+      }
+    ];
   }
 
   function handleClick(e) {
     if (!zoomDollar && !zoomNumber) {
-      if (e[0]===undefined){
-      } else if (e[0]._datasetIndex ===0){
+      if (e[0] === undefined) {
+      } else if (e[0]._datasetIndex === 0) {
         dispatch({
           type: "ZOOM_DOLLAR",
           payload: e[0]._index
-        })
-      } else if (e[0]._datasetIndex ===1){
+        });
+      } else if (e[0]._datasetIndex === 1) {
         dispatch({
-          type:"ZOOM_NUMBER",
+          type: "ZOOM_NUMBER",
           payload: e[0]._index
-        })
+        });
+      }
+    } else if (zoomDollar) {
+      if (e[0] === undefined) {
+        dispatch({
+          type: "RETURN"
+        });
+      } else if (e[0]._datasetIndex === 1) {
+        dispatch({
+          type: "ZOOM_NUMBER_MONTH",
+          payload: e[0]._index
+        });
       }
     } else {
       dispatch({
@@ -147,141 +213,89 @@ function LoanExpiriesPerYearChart(props) {
     }
   }
 
-  // function handleClick(e) {
-  //   if (chartState === 0) {
-  //     setChartState(1);
-  //     if (e[0] === undefined) {
-  //     } else if (e[0]._datasetIndex === 0) {
-  //       // user clicked $
-  //       updateDatasetForChart(e);
-  //     } else {
-  //       // user clicked #
-  //       setModalVisibility(true);
-  //       updateDatasetForTable(e);
-  //     }
-  //   } else {
-  //     setDatasetForChart(defaultDatasetForChart);
-  //     setLabelsForChart(years);
-  //     setChartState(0);
-  //   }
-  // }
+  // update hooks to be used for table
+  function populateDatasetForTable(year) {
+    const parsedDataArray = props.data;
 
-  const monthsNum = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+    const dataForTable = parsedDataArray.filter(
+      loan => loan.expiryDate.getFullYear() === years[year]
+    );
 
-  const monthsText = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec"
+    let x = 0;
+
+    return dataForTable.map(loan => ({
+      key: x++,
+      ...loan
+    }));
+  }
+
+  function populateDatasetForTableMonth(month) {
+    const parsedDataArrayForYear = datasetForChart;
+
+    console.log(parsedDataArrayForYear);
+
+    // const dataForTable = parsedDataArray.filter(
+    //   loan => loan.expiryDate.getFullYear() === years[year]
+    // );
+
+    // let x = 0;
+
+    // return dataForTable.map(loan => ({
+    //   key: x++,
+    //   ...loan
+    // }));
+
+    return [];
+  }
+
+  const columnsForTable = [
+    {
+      title: "Address",
+      dataIndex: "address",
+      key: "address"
+    },
+    {
+      title: "Lender",
+      dataIndex: "lender",
+      key: "lender"
+    },
+    {
+      title: "Loan Amount",
+      dataIndex: "loanAmount",
+      key: "loanAmount"
+    },
+    {
+      title: "Expiry Date",
+      dataIndex: "expiryDateString",
+      key: "expiryDateString"
+    },
+    {
+      title: "Interest Rate",
+      dataIndex: "interestRate",
+      key: "interestRate"
+    },
+    {
+      title: "LTV",
+      dataIndex: "LTV",
+      key: "LTV"
+    },
+    {
+      title: "DSCR",
+      dataIndex: "DSCR",
+      key: "DSCR"
+    },
+    {
+      title: "Property Value",
+      dataIndex: "propertyValue",
+      key: "propertyValue"
+    }
   ];
 
-  //   const numPropertiesExpiringPerMonth = new Array(12).fill(0);
-  //   const totalPrincipalRemainingPerMonth = new Array(12).fill(0);
-
-  //   parsedDataArray
-  //     .filter(loan => loan.expiryDate.getFullYear() === years[e[0]._index])
-  //     .forEach(loan => {
-  //       if (monthsNum.includes(loan.expiryDate.getMonth())) {
-  //         numPropertiesExpiringPerMonth[
-  //           monthsNum.indexOf(loan.expiryDate.getMonth())
-  //         ]++;
-  //         totalPrincipalRemainingPerMonth[
-  //           monthsNum.indexOf(loan.expiryDate.getMonth())
-  //         ] += loan.principalRemaingAtEndOfTerm;
-  //       }
-  //     });
-
-  //   setLabelsForChart(monthsText);
-  //   setDatasetForChart([
-  //     {
-  //       label: "$",
-  //       data: totalPrincipalRemainingPerMonth,
-  //       backgroundColor: "rgba(255, 99, 132, 0.5)",
-  //       yAxisID: "1"
-  //     },
-  //     {
-  //       label: "# Properties",
-  //       data: numPropertiesExpiringPerMonth,
-  //       backgroundColor: "rgba(255, 206, 86, 0.5)",
-  //       yAxisID: "2"
-  //     }
-  //   ]);
-  // }
-
-  // const [dataSourceForTable, setDataSourceForTable] = useState([]);
-
-  // // update hooks to be used for table
-  // function updateDatasetForTable(e) {
-  //   const dataForTable = parsedDataArray.filter(
-  //     loan => loan.expiryDate.getFullYear() === years[e[0]._index]
-  //   );
-
-  //   let x = 0;
-
-  //   setDataSourceForTable(
-  //     dataForTable.map(loan => ({
-  //       key: x++,
-  //       ...loan
-  //     }))
-  //   );
-  // }
-
-  // const columnsForTable = [
-  //   {
-  //     title: "Address",
-  //     dataIndex: "address",
-  //     key: "address"
-  //   },
-  //   {
-  //     title: "Lender",
-  //     dataIndex: "lender",
-  //     key: "lender"
-  //   },
-  //   {
-  //     title: "Loan Amount",
-  //     dataIndex: "loanAmount",
-  //     key: "loanAmount"
-  //   },
-  //   {
-  //     title: "Expiry Date",
-  //     dataIndex: "expiryDateString",
-  //     key: "expiryDateString"
-  //   },
-  //   {
-  //     title: "Interest Rate",
-  //     dataIndex: "interestRate",
-  //     key: "interestRate"
-  //   },
-  //   {
-  //     title: "LTV",
-  //     dataIndex: "LTV",
-  //     key: "LTV"
-  //   },
-  //   {
-  //     title: "DSCR",
-  //     dataIndex: "DSCR",
-  //     key: "DSCR"
-  //   },
-  //   {
-  //     title: "Property Value",
-  //     dataIndex: "propertyValue",
-  //     key: "propertyValue"
-  //   }
-  // ];
-
-  // // parameters for chart
-  // const data = {
-  //   labels: labelsForChart,
-  //   datasets: datasetForChart
-  // };
+  // parameters for chart
+  const data = {
+    labels: labelsForChart,
+    datasets: datasetForChart
+  };
 
   const options = {
     responsive: true,
@@ -310,25 +324,28 @@ function LoanExpiriesPerYearChart(props) {
     }
   };
 
-
   return (
     <Fragment>
       <Bar
-        data={datasetForChart}
+        data={data}
         width={2000}
         getElementAtEvent={e => handleClick(e)}
         height={500}
         options={options}
       />
-      {/* <Modal
+      <Modal
         title="Loans"
         footer={null}
-        visible={modalVisibility}
-        onCancel={() => setModalVisibility(false)}
+        visible={showModal}
+        onCancel={() =>
+          dispatch({
+            type: "RETURN"
+          })
+        }
         width="auto"
       >
-        <Table dataSource={dataSourceForTable} columns={columnsForTable} />
-      </Modal> */}
+        <Table dataSource={datasetForTable} columns={columnsForTable} />
+      </Modal>
     </Fragment>
   );
 }

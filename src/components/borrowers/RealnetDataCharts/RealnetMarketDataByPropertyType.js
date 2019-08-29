@@ -1,19 +1,12 @@
 import React, { useState, useEffect } from "react";
-import Papa from "papaparse";
-import realnetCSV from "../../resources/realnetUpdated.csv";
 import PieChart from "./PieChart";
 
-function RealnetMarketData() {
-  const [parsedRealnetData, setParsedRealnetData] = useState();
+function RealnetMarketDataByPropertyType({ parsedRealnetData }) {
   const [propertyData, setPropertyData] = useState({});
   const [pieChartData, setPieChartData] = useState();
 
   useEffect(() => {
-    parseData(realnetCSV, updateParsedRealnetData);
-  }, []);
-
-  useEffect(() => {
-    if (parsedRealnetData) {
+    if (parsedRealnetData !== undefined) {
       filterDataByPropertyType();
     }
   }, [parsedRealnetData]);
@@ -96,23 +89,13 @@ function RealnetMarketData() {
     });
   };
 
-  const updateParsedRealnetData = parsedData => {
-    setParsedRealnetData(parsedData);
-  };
-
-  const parseData = (link, callBack) => {
-    Papa.parse(link, {
-      header: true,
-      download: true,
-      complete: results => {
-        callBack(results.data);
-      }
-    });
-  };
-
   return (
-    <PieChart pieChartData={pieChartData} tableData={propertyData}></PieChart>
+    <PieChart
+      pieChartData={pieChartData}
+      tableData={propertyData}
+      showBy="propertyType"
+    ></PieChart>
   );
 }
 
-export default RealnetMarketData;
+export default RealnetMarketDataByPropertyType;

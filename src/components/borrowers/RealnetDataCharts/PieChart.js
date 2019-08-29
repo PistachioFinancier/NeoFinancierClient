@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Modal, Table } from "antd";
-import CanvasJSReact from "../../assets/canvasjs.react";
+import CanvasJSReact from "../../../assets/canvasjs.react";
 
 const CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
@@ -17,15 +17,22 @@ function PieChart(props) {
   };
 
   const populateTableData = category => {
-    const categoryMap = {
-      Apartment: "apartment",
-      Office: "office",
-      Retail: "retail",
-      ResidentialLand: "residentialLand",
-      Industrial: "industrial",
-      ICILand: "iCILand",
-      Hotel: "hotel"
-    };
+    let categoryMap = {};
+    if (props.showBy === "propertyType") {
+      categoryMap = {
+        Apartment: "apartment",
+        Office: "office",
+        Retail: "retail",
+        ResidentialLand: "residentialLand",
+        Industrial: "industrial",
+        ICILand: "iCILand",
+        Hotel: "hotel"
+      };
+    } else {
+      for (let i of Object.keys(props.tableData)) {
+        categoryMap[i] = i;
+      }
+    }
 
     let key = 1;
     const dataForTable = props.tableData[categoryMap[category]].map(item => ({
@@ -58,7 +65,11 @@ function PieChart(props) {
   const options = {
     animationEnabled: true,
     title: {
-      text: "Market Data - Past 1 Year"
+      text: `Market Data for Past 1 Year: ${
+        props.showBy === "propertyType"
+          ? "by Property Type"
+          : "by Lender Category"
+      }`
     },
     data: [
       {
