@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment } from "react";
 import {
   Row,
   Col,
@@ -12,17 +12,9 @@ import {
 } from "antd";
 
 function Services(props) {
-  const [editRow, setEditRow] = useState(-1);
+  const type = "Lease";
 
-  const type = "Leases";
-
-  const editButtonOnClick = (row, index) => {
-    console.log(row);
-    setEditRow(index);
-    console.log(index);
-  };
-
-  const sampleData = [
+  const leaseData = [
     {
       name: "Hospital",
       submissionDate: "January 25 2019",
@@ -52,109 +44,158 @@ function Services(props) {
     }
   ];
 
-  const columns = [
+  const leaseColumns = [
     {
       title: "Property Name",
       dataIndex: "name",
-      key: "name",
-      render: (cell, row, index) => {
-        if (editRow === index) {
-          return <Input defaultValue={cell}></Input>;
-        } else {
-          return <Fragment>{cell}</Fragment>;
-        }
-      }
+      key: "name"
     },
     {
       title: "Submission Date",
       dataIndex: "submissionDate",
-      key: "submissionDate",
-      render: (cell, row, index) => {
-        if (editRow !== -1) {
-          return <Input value={cell}></Input>;
-        } else {
-          return <Fragment>{cell}</Fragment>;
-        }
-      }
+      key: "submissionDate"
     },
     {
       title: "Payment Status",
       dataIndex: "paymentStatus",
-      key: "paymentStatus",
-      render: (cell, row, index) => {
-        if (editRow !== -1) {
-          return <Input value={cell}></Input>;
-        } else {
-          return <Fragment>{cell}</Fragment>;
-        }
-      }
+      key: "paymentStatus"
     },
     {
       title: "Service Status (Months)",
       dataIndex: "serviceStatus",
-      key: "serviceStatus",
-      render: (cell, row, index) => {
-        if (editRow !== -1) {
-          return <Input value={cell}></Input>;
-        } else {
-          return <Fragment>{cell}</Fragment>;
-        }
-      }
+      key: "serviceStatus"
     },
     {
       title: "Address",
       dataIndex: "address",
-      key: "address",
-      render: (cell, row, index) => {
-        if (editRow !== -1) {
-          return <Input value={cell}></Input>;
-        } else {
-          return <Fragment>{cell}</Fragment>;
-        }
-      }
+      key: "address"
     },
     {
       title: "Leases",
       dataIndex: "leases",
-      key: "leases",
-      render: (cell, row, index) => {
-        if (editRow !== -1) {
-          return <Input value={cell}></Input>;
-        } else {
-          return <Fragment>{cell}</Fragment>;
-        }
-      }
+      key: "leases"
     },
     {
       title: "Timing (Days)",
       dataIndex: "timing",
-      key: "timing",
-      render: (cell, row, index) => {
-        return (
-          <Fragment>
-            {cell}{" "}
-            <Tag color="blue" onClick={() => editButtonOnClick(row, index)}>
-              Edit
-            </Tag>
-          </Fragment>
-        );
-      }
+      key: "timing"
     }
   ];
+
+  const leaseDescription = `Finneo utilizes an extensive network of 3rd party contacts to
+    facilitate lease reviews and audits. Our team will then analyze & summarize the key 
+    points associated with each and every lease submitted to our team of experts. 
+    This will free up your time to better focus on negotiations.`;
+
+  const droneData = [
+    {
+      name: "sample",
+      submissionDate: "April 18, 2017",
+      paymentStatus: "Pending",
+      serviceStatus: "Pending",
+      address: "test",
+      timing: "my time",
+      purpose: "my purpose",
+      url: "insert url here"
+    }
+  ];
+
+  const droneColumns = [
+    {
+      title: "Property Name",
+      dataIndex: "name",
+      key: "name"
+    },
+    {
+      title: "Submission Date",
+      dataIndex: "submissionDate",
+      key: "submissionDate"
+    },
+    {
+      title: "Payment Status",
+      dataIndex: "paymentStatus",
+      key: "paymentStatus"
+    },
+    {
+      title: "Service Status",
+      dataIndex: "serviceStatus",
+      key: "serviceStatus"
+    },
+    {
+      title: "Address",
+      dataIndex: "address",
+      key: "address"
+    },
+    {
+      title: "Timing",
+      dataIndex: "timing",
+      key: "timing"
+    },
+    {
+      title: "Purpose",
+      dataIndex: "purpose",
+      key: "purpose"
+    },
+    {
+      title: "Url",
+      dataIndex: "url",
+      key: "url"
+    }
+  ];
+
+  const droneDescription = `Pistachio Financier offers an exclusive drone service to create state of the 
+  art marketing materials. Through our years of experience, we have developed a vast network of contacts 
+  across Canada that are guaranteed to give you the lowest possible rates with any aerial drone footage 
+  required to maximize the marketing potential of your property.`;
+
+  const inspectionsData = [
+    {
+      name: "sample",
+      submissionDate: "January 1, 2017",
+      paymentStatus: "Pending",
+      serviceStatus: "Pending",
+      address: "test",
+      timing: "my time",
+      purpose: "my purpose",
+      url: "insert url here"
+    }
+  ];
+
+  const inspectionsDescription = `Assessing the condition of buildings, facilities or lands is critical, 
+  and often overlooked by property owners and developers looking for financing. In addition to the many 
+  other services provided, the decades of real estate experience provided by the Pistachio team allows 
+  us to connect you with the most reliable and reputable inspectors in the industry.`;
+
+  let showData;
+  let showColumns;
+  let showDescription;
+
+  switch (type) {
+    case "Lease":
+      showData = leaseData;
+      showColumns = leaseColumns;
+      showDescription = leaseDescription;
+      break;
+    case "Drone":
+      showData = droneData;
+      showColumns = droneColumns;
+      showDescription = droneDescription;
+      break;
+    default:
+      showData = inspectionsData;
+      showColumns = droneColumns;
+      showDescription = inspectionsDescription;
+  }
 
   return (
     <Fragment>
       <div style={{ "background-color": "blue", color: "white" }}>
         <p style={{ "padding-top": "20px", "padding-bottom": "20px" }}>
-          Finneo utilizes an extensive network of 3rd party contacts to
-          facilitate lease reviews and audits. Our team will then analyze &
-          summarize the key points associated with each and every lease
-          submitted to our team of experts. This will free up your time to
-          better focus on negotiations.
+          {showDescription}
         </p>
       </div>
-      ​<h3>Leases</h3>
-      <Table dataSource={sampleData} columns={columns} />
+      ​<h3>{type}</h3>
+      <Table dataSource={showData} columns={showColumns} />
     </Fragment>
   );
 }
