@@ -1,13 +1,13 @@
-import React, { Fragment, useReducer } from "react";
+import React, { Fragment, useReducer, useState } from "react";
 import { Bar } from "react-chartjs-2";
 import { Modal, Table } from "antd";
+import { abbrNum } from "../../../scripts/abbreviateNumber";
 
 function LoanExpiriesPerYearChart(props) {
-  const currentYear = new Date().getFullYear();
-
   const totalNumYearsForChart = 10;
-
   const years = [];
+
+  const currentYear = new Date().getFullYear();
 
   for (
     let i = currentYear - totalNumYearsForChart / 2;
@@ -17,18 +17,25 @@ function LoanExpiriesPerYearChart(props) {
     years.push(i);
   }
 
+  const [zoomedYear, setZoomedYear] = useState();
+  const [zoomedMonth, setZoomedMonth] = useState();
+
   const initialState = {
-    zoomDollar: false,
-    zoomNumber: false,
+    zoomMonths: false,
+    showTableYear: false,
+    showTableMonth: false,
     labelsForChart: years,
     datasetForChart: populateArraysForChartDefault(),
     showModal: false,
     datasetForTable: []
   };
+
   const [state, dispatch] = useReducer(userActionReducer, initialState);
+
   const {
-    zoomDollar,
-    zoomNumber,
+    zoomMonths,
+    showTableYear,
+    showTableMonth,
     labelsForChart,
     datasetForChart,
     showModal,
@@ -51,35 +58,50 @@ function LoanExpiriesPerYearChart(props) {
       "Dec"
     ];
     switch (action.type) {
-      case "ZOOM_DOLLAR": {
+      case "ZOOM_MONTHS": {
+        setZoomedYear(action.payload);
         return {
           ...state,
-          zoomDollar: true,
+          zoomMonths: true,
           labelsForChart: monthsText,
-          datasetForChart: populateArraysForChartZoomedDollar(action.payload)
+          datasetForChart: populateArraysForChartZoomedMonths(action.payload)
         };
       }
-      case "ZOOM_NUMBER": {
+      case "SHOW_TABLE_YEAR": {
+        setZoomedYear(action.payload);
         return {
           ...state,
-          zoomNumber: true,
+          showTableYear: true,
           showModal: true,
           datasetForTable: populateDatasetForTable(action.payload)
         };
       }
-      case "ZOOM_NUMBER_MONTH": {
+      case "SHOW_TABLE_MONTH": {
+        setZoomedMonth(action.payload);
         return {
           ...state,
-          zoomNumber: true,
+          showTableMonth: true,
           showModal: true,
           datasetForTable: populateDatasetForTableMonth(action.payload)
         };
       }
-      case "RETURN": {
+      case "RETURN_TO_ZOOM_MONTHS": {
         return {
           ...state,
-          zoomDollar: false,
-          zoomNumber: false,
+          zoomMonths: true,
+          showTableYear: false,
+          showTableMonth: false,
+          showModal: false,
+          labelsForChart: monthsText,
+          datasetForChart: populateArraysForChartZoomedMonths(zoomedYear)
+        };
+      }
+      case "RETURN": {
+        setZoomedMonth(null);
+        return {
+          ...state,
+          zoomMonths: false,
+          showTableYear: false,
           showModal: false,
           labelsForChart: years,
           datasetForChart: populateArraysForChartDefault()
@@ -129,10 +151,12 @@ function LoanExpiriesPerYearChart(props) {
 
     for (let i = 0; i < totalNumYearsForChart; i++) {
       for (let j = 0; j < 12; j++) {
-        totalPrincipalRemainingPerYear[i] +=
-          dataObject[i * 12 + j].loanExpiriesDollar;
-        numPropertiesExpiringPerYear[i] +=
-          dataObject[i * 12 + j].loanExpiriesNumber;
+        totalPrincipalRemainingPerYear[i] += Math.round(
+          dataObject[i * 12 + j].loanExpiriesDollar
+        );
+        numPropertiesExpiringPerYear[i] += Math.round(
+          dataObject[i * 12 + j].loanExpiriesNumber
+        );
       }
     }
 
@@ -140,69 +164,92 @@ function LoanExpiriesPerYearChart(props) {
       {
         label: "Total $",
         data: totalPrincipalRemainingPerYear,
-        backgroundColor: "rgba(255, 99, 132, 0.5)",
+        backgroundColor: "#7D3A96",
         yAxisID: "1"
       },
       {
         label: "# Properties",
         data: numPropertiesExpiringPerYear,
-        backgroundColor: "rgba(255, 206, 86, 0.5)",
+        backgroundColor: "#F26722",
         yAxisID: "2"
       }
     ];
   }
 
-  function populateArraysForChartZoomedDollar(year) {
+  function populateArraysForChartZoomedMonths(year) {
     const { dataObject } = mainCalculation();
 
     const totalPrincipalRemainingPerMonth = Array(12);
     const numPropertiesExpiringPerMonth = Array(12);
 
     for (let i = 0; i < 12; i++) {
-      totalPrincipalRemainingPerMonth[i] =
-        dataObject[i + year * 12].loanExpiriesDollar;
-      numPropertiesExpiringPerMonth[i] =
-        dataObject[i + year * 12].loanExpiriesNumber;
+      totalPrincipalRemainingPerMonth[i] = Math.round(
+        dataObject[i + year * 12].loanExpiriesDollar
+      );
+      numPropertiesExpiringPerMonth[i] = Math.round(
+        dataObject[i + year * 12].loanExpiriesNumber
+      );
     }
 
     return [
       {
         label: "Total $",
         data: totalPrincipalRemainingPerMonth,
-        backgroundColor: "rgba(255, 99, 132, 0.5)",
+        backgroundColor: "#7D3A96",
         yAxisID: "1"
       },
       {
         label: "# Properties",
         data: numPropertiesExpiringPerMonth,
-        backgroundColor: "rgba(255, 206, 86, 0.5)",
+        backgroundColor: "#F26722",
         yAxisID: "2"
       }
     ];
   }
 
+  function populateDatasetForTableMonth(month) {
+    const parsedDataArray = props.data;
+
+    const dataForTable = parsedDataArray.filter(
+      loan =>
+        loan.expiryDate.getFullYear() === years[zoomedYear] &&
+        loan.expiryDate.getMonth() === month
+    );
+
+    let x = 0;
+
+    return dataForTable.map(loan => ({
+      key: x++,
+      ...loan
+    }));
+  }
+
   function handleClick(e) {
-    if (!zoomDollar && !zoomNumber) {
+    if (!zoomMonths && !showTableYear && !showTableMonth) {
       if (e[0] === undefined) {
       } else if (e[0]._datasetIndex === 0) {
         dispatch({
-          type: "ZOOM_DOLLAR",
+          type: "ZOOM_MONTHS",
           payload: e[0]._index
         });
       } else if (e[0]._datasetIndex === 1) {
         dispatch({
-          type: "ZOOM_NUMBER",
+          type: "SHOW_TABLE_YEAR",
           payload: e[0]._index
         });
       }
-    } else if (zoomDollar) {
-      if (e[0] === undefined) {
+    } else if (zoomMonths) {
+      if (showTableMonth) {
+        dispatch({
+          type: "RETURN_TO_ZOOM_MONTHS"
+        });
+      } else if (e[0] === undefined) {
         dispatch({
           type: "RETURN"
         });
       } else if (e[0]._datasetIndex === 1) {
         dispatch({
-          type: "ZOOM_NUMBER_MONTH",
+          type: "SHOW_TABLE_MONTH",
           payload: e[0]._index
         });
       }
@@ -227,25 +274,6 @@ function LoanExpiriesPerYearChart(props) {
       key: x++,
       ...loan
     }));
-  }
-
-  function populateDatasetForTableMonth(month) {
-    const parsedDataArrayForYear = datasetForChart;
-
-    console.log(parsedDataArrayForYear);
-
-    // const dataForTable = parsedDataArray.filter(
-    //   loan => loan.expiryDate.getFullYear() === years[year]
-    // );
-
-    // let x = 0;
-
-    // return dataForTable.map(loan => ({
-    //   key: x++,
-    //   ...loan
-    // }));
-
-    return [];
   }
 
   const columnsForTable = [
@@ -302,7 +330,8 @@ function LoanExpiriesPerYearChart(props) {
     scales: {
       xAxes: [
         {
-          barPercentage: 0.4
+          barPercentage: 0.7,
+          categoryPercentage: 0.4
         }
       ],
       yAxes: [
@@ -310,7 +339,13 @@ function LoanExpiriesPerYearChart(props) {
           id: "1",
           position: "left",
           ticks: {
-            beginAtZero: true
+            beginAtZero: true,
+            callback: function(value, index, values) {
+              return "$" + abbrNum(value, 2);
+            }
+          },
+          gridLines: {
+            lineWidth: 0
           }
         },
         {
@@ -318,11 +353,29 @@ function LoanExpiriesPerYearChart(props) {
           position: "right",
           ticks: {
             beginAtZero: true
+          },
+          gridLines: {
+            lineWidth: 0
           }
         }
       ]
     }
   };
+
+  const monthsTextLong = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December"
+  ];
 
   return (
     <Fragment>
@@ -334,14 +387,12 @@ function LoanExpiriesPerYearChart(props) {
         options={options}
       />
       <Modal
-        title="Loans"
+        title={`Loans Expiring in ${years[zoomedYear]} ${
+          zoomMonths ? monthsTextLong[zoomedMonth] : ""
+        }`}
         footer={null}
         visible={showModal}
-        onCancel={() =>
-          dispatch({
-            type: "RETURN"
-          })
-        }
+        onCancel={e => handleClick(e)}
         width="auto"
       >
         <Table dataSource={datasetForTable} columns={columnsForTable} />

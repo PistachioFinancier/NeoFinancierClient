@@ -11,7 +11,8 @@ function LenderDiversificationPieChart(props) {
         return {
           ...state,
           showModal: true,
-          datasetForTable: getDatasetForTable(action.payload)
+          datasetForTable: getDatasetForTable(action.payload),
+          selectedLenderCategory: action.payload
         };
       }
       case "RETURN": {
@@ -27,7 +28,20 @@ function LenderDiversificationPieChart(props) {
   }
 
   function getDatasetForTable(label) {
-    return props.tableData.filter(loan => loan.lenderClassification === label);
+    let key = 0;
+    return props.tableData
+      .filter(loan => loan.lenderClassification === label)
+      .map(item => ({
+        key: key++,
+        address: item.address,
+        lender: item.lender,
+        loanAmount: item.loanAmount,
+        expiryDateString: item.expiryDateString,
+        interestRate: item.interestRate,
+        LTV: item.LTV,
+        DSCR: item.DSCR,
+        propertyValue: item.propertyValue
+      }));
   }
 
   const initialState = {
@@ -35,7 +49,7 @@ function LenderDiversificationPieChart(props) {
     datasetForTable: null
   };
   const [state, dispatch] = useReducer(userActionReducer, initialState);
-  const { showModal, datasetForTable } = state;
+  const { showModal, datasetForTable, selectedLenderCategory } = state;
 
   const options = {
     animationEnabled: true,
@@ -50,7 +64,7 @@ function LenderDiversificationPieChart(props) {
             payload: e.dataPoint.label
           });
         },
-        type: "pie",
+        type: "doughnut",
         toolTipContent: "<b>{label}</b>: {y}%",
         showInLegend: "true",
         legendText: "{label}",
@@ -108,6 +122,7 @@ function LenderDiversificationPieChart(props) {
     <div>
       <CanvasJSChart options={options} />
       <Modal
+        title={`Loaned from ${selectedLenderCategory}`}
         visible={showModal}
         onCancel={() => {
           dispatch({

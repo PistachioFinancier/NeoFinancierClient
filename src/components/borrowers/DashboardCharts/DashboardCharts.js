@@ -4,6 +4,10 @@ import PrincipalInterestChart from "./PrincipalInterestChart";
 import LenderDiversificationChart from "./LenderDiversificationChart";
 import { amortSchedCA } from "../../../scripts/amortCA";
 import addMonths from "date-fns/addMonths";
+import startOfMonth from "date-fns/startOfMonth";
+import getDaysInMonth from "date-fns/getDaysInMonth";
+import endOfMonth from "date-fns/endOfMonth";
+import { Row, Col } from "antd";
 
 function retrieveAndParseData() {
   const sampleData = [
@@ -1505,8 +1509,14 @@ function retrieveAndParseData() {
         loan.Term,
         loan.Amortization
       )[loan.Term - 1]["principal remaining"] || 0,
-    expiryDate: addMonths(new Date(loan.First_Payment_Date), loan.Term), // TODO: make this work correctly on edge cases!! (august 31 plus 1 month should be sep 30 !!!!!),
-    expiryDateString: addMonths(new Date(loan.First_Payment_Date), loan.Term)
+    expiryDate: addMonthsCorrectly(
+      new Date(loan.First_Payment_Date),
+      loan.Term
+    ),
+    expiryDateString: addMonthsCorrectly(
+      new Date(loan.First_Payment_Date),
+      loan.Term
+    )
       .toISOString()
       .slice(0, 10),
     address: loan.Address,
@@ -1534,16 +1544,39 @@ function retrieveAndParseData() {
 
 const parsedDataArray = retrieveAndParseData();
 
+function addMonthsCorrectly(firstPaymentDate, term) {
+  if (
+    firstPaymentDate.getDate() >
+    getDaysInMonth(addMonths(startOfMonth(firstPaymentDate), term))
+  ) {
+    return endOfMonth(addMonths(startOfMonth(firstPaymentDate), term));
+  } else {
+    return addMonths(firstPaymentDate, term);
+  }
+}
+
 function DashboardCharts() {
   return (
     <React.Fragment>
-      <LoanExpiriesPerYearChart
-        data={parsedDataArray}
-      ></LoanExpiriesPerYearChart>
-      <PrincipalInterestChart data={parsedDataArray}></PrincipalInterestChart>
-      <LenderDiversificationChart
-        data={parsedDataArray}
-      ></LenderDiversificationChart>
+      <Row>
+        <Col span={12}>
+          <LoanExpiriesPerYearChart
+            data={parsedDataArray}
+          ></LoanExpiriesPerYearChart>
+        </Col>
+        <Col span={12}>
+          <PrincipalInterestChart
+            data={parsedDataArray}
+          ></PrincipalInterestChart>
+        </Col>
+      </Row>
+      <Row>
+        <Col span={12}>
+          <LenderDiversificationChart
+            data={parsedDataArray}
+          ></LenderDiversificationChart>
+        </Col>
+      </Row>
     </React.Fragment>
   );
 }

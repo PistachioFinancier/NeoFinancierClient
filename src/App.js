@@ -8,6 +8,12 @@ import LenderList from "./components/lenders/lenderList/LenderList";
 import LenderListSelect from "./components/lenders/lenderList/LenderListSelect";
 import LenderPage from "./components/lenders/lenderPage/LenderPage";
 import DashboardCharts from "./components/borrowers/DashboardCharts/DashboardCharts";
+import ConsultantList from "./components/consultants/ConsultantList";
+import { Form } from "react-formio";
+import { Row, Col } from "antd";
+import DealPage from "./components/dealPage/DealPage";
+import ColliersDashboardUnderwriter from "./components/borrowers/colliersDashboard/ColliersDashboardUnderwriter";
+import ManagePortfolioPage from "./components/borrowers/managePortfolio/ManagePortfolioPage";
 
 function App() {
   const places = [
@@ -49,21 +55,31 @@ function App() {
     <div className="App">
       {/* <Calculators /> */}
 
-      {/* <div>
-        <LenderMap
-          provinces={["ON", "QC"]}
-          center={{ lat: 52.8415678, lng: -95.153671399999993 }}
-        />
-      </div> */}
+      {/* <LenderMap
+        provinces={["ON", "QC"]}
+        center={{ lat: 52.8415678, lng: -95.153671399999993 }}
+      /> */}
 
-      {/* <div>
-        <BorrowerMap places={places} />
-      </div> */}
-      <RealnetMarketData />
+      {/* <BorrowerMap places={places} /> */}
+      {/* <RealnetMarketData /> */}
       {/* <LenderList></LenderList> */}
       {/* <LenderListSelect></LenderListSelect> */}
       {/* <LenderPage /> */}
       {/* <DashboardCharts></DashboardCharts> */}
+      {/* <ConsultantList></ConsultantList> */}
+      {/* <Row>
+        <Col span={4}></Col>
+        <Col span={16}>
+          <Form
+            src="http://localhost:3001/newDealForm"
+            onSubmitDone={function(submission) {}}
+          />
+        </Col>
+        <Col span={4}></Col>
+      </Row> */}
+      {/* <DealPage></DealPage> */}
+      {/* <ColliersDashboardUnderwriter></ColliersDashboardUnderwriter> */}
+      <ManagePortfolioPage></ManagePortfolioPage>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import React, { Fragment, useReducer } from "react";
 import { Bar } from "react-chartjs-2";
 import { amortSchedCA } from "../../../scripts/amortCA";
+import { abbrNum } from "../../../scripts/abbreviateNumber";
 
 function PrincipalInterestChart(props) {
   function mainCalculation() {
@@ -68,8 +69,11 @@ function PrincipalInterestChart(props) {
         totalInterestPaidPerYear[i] += dataObject[`${i * 12 + j}`].interestPaid;
       }
       defaultDatasetForAvgInterestRatePerYear[i] =
-        defaultDatasetForAvgInterestRatePerYear[i] /
-        totalInterestPaidPerYear[i];
+        Math.round(
+          (defaultDatasetForAvgInterestRatePerYear[i] /
+            totalInterestPaidPerYear[i]) *
+            100
+        ) / 100;
     }
 
     return defaultDatasetForAvgInterestRatePerYear;
@@ -83,8 +87,11 @@ function PrincipalInterestChart(props) {
 
     for (let i = 0; i < 12; i++) {
       datasetForChartZoomedAvgInterestRate[i] =
-        dataObject[`${indexOfStartOfSelectedYear + i}`].avgInterestRateAcc /
-        dataObject[`${indexOfStartOfSelectedYear + i}`].interestPaid;
+        Math.round(
+          (dataObject[`${indexOfStartOfSelectedYear + i}`].avgInterestRateAcc /
+            dataObject[`${indexOfStartOfSelectedYear + i}`].interestPaid) *
+            100
+        ) / 100;
     }
 
     return datasetForChartZoomedAvgInterestRate;
@@ -99,35 +106,37 @@ function PrincipalInterestChart(props) {
     // populate blank arrays
     for (let i = 0; i < totalNumYearsForChart; i++) {
       for (let j = 0; j < 12; j++) {
-        defaultDatasetForChartPrincipal[i] +=
-          dataObject[`${i * 12 + j}`].principalPaid;
-        defaultDatasetForChartInterest[i] +=
-          dataObject[`${i * 12 + j}`].interestPaid;
+        defaultDatasetForChartPrincipal[i] += Math.round(
+          dataObject[`${i * 12 + j}`].principalPaid
+        );
+        defaultDatasetForChartInterest[i] += Math.round(
+          dataObject[`${i * 12 + j}`].interestPaid
+        );
       }
     }
     return [
-      {
-        label: "Principal",
-        data: defaultDatasetForChartPrincipal,
-        backgroundColor: "rgba(255, 99, 132, 0.5)",
-        yAxisID: "1"
-      },
-      {
-        label: "Interest",
-        data: defaultDatasetForChartInterest,
-        backgroundColor: "rgba(255, 206, 86, 0.5)",
-        yAxisID: "1"
-      },
       {
         label: "Average Interest Rate Weighted",
         data: populateArraysForAvgInterestRateDefault(),
         type: "line",
         fill: false,
-        showLine: false,
         yAxisID: "2",
-        backgroundColor: "rgba(54,162,235, 0.8)",
-        pointBackgroundColor: "rgba(54,162,235, 0.8)",
-        pointBorderColor: "rgba(54,162,235, 0.8)"
+        backgroundColor: "rgba(255, 206, 86, 1)",
+        borderColor: "rgba(255, 206, 86, 1)",
+        pointBackgroundColor: "rgba(255, 206, 86, 1)",
+        pointBorderColor: "rgba(255, 206, 86, 1)"
+      },
+      {
+        label: "Principal",
+        data: defaultDatasetForChartPrincipal,
+        backgroundColor: "#7D3A96",
+        yAxisID: "1"
+      },
+      {
+        label: "Interest",
+        data: defaultDatasetForChartInterest,
+        backgroundColor: "#F26722",
+        yAxisID: "1"
       }
     ];
   }
@@ -141,33 +150,37 @@ function PrincipalInterestChart(props) {
     let indexOfStartOfSelectedYear = yearIndex * 12;
 
     for (let i = 0; i < 12; i++) {
-      datasetForChartZoomPrincipal[i] +=
-        dataObject[`${indexOfStartOfSelectedYear + i}`].principalPaid;
-      datasetForChartZoomInterest[i] +=
-        dataObject[`${indexOfStartOfSelectedYear + i}`].interestPaid;
+      datasetForChartZoomPrincipal[i] += Math.round(
+        dataObject[`${indexOfStartOfSelectedYear + i}`].principalPaid
+      );
+      datasetForChartZoomInterest[i] += Math.round(
+        dataObject[`${indexOfStartOfSelectedYear + i}`].interestPaid
+      );
     }
 
     return [
-      {
-        label: "Principal",
-        data: datasetForChartZoomPrincipal,
-        backgroundColor: "rgba(255, 99, 132, 0.5)"
-      },
-      {
-        label: "Interest",
-        data: datasetForChartZoomInterest,
-        backgroundColor: "rgba(255, 206, 86, 0.5)"
-      },
       {
         label: "Average Interest Rate Weighted",
         data: populateArraysForAvgInterestRateZoomed(yearIndex),
         type: "line",
         fill: false,
-        showLine: false,
         yAxisID: "2",
-        backgroundColor: "rgba(54,162,235, 0.8)",
-        pointBackgroundColor: "rgba(54,162,235, 0.8)",
-        pointBorderColor: "rgba(54,162,235, 0.8)"
+        backgroundColor: "rgba(255, 206, 86, 1)",
+        borderColor: "rgba(255, 206, 86, 1)",
+        pointBackgroundColor: "rgba(255, 206, 86, 1)",
+        pointBorderColor: "rgba(255, 206, 86, 1)"
+      },
+      {
+        label: "Principal",
+        data: datasetForChartZoomPrincipal,
+        backgroundColor: "#7D3A96",
+        yAxisID: "1"
+      },
+      {
+        label: "Interest",
+        data: datasetForChartZoomInterest,
+        backgroundColor: "#F26722",
+        yAxisID: "1"
       }
     ];
   }
@@ -274,7 +287,13 @@ function PrincipalInterestChart(props) {
           id: "1",
           position: "left",
           ticks: {
-            beginAtZero: true
+            beginAtZero: true,
+            callback: function(value, index, values) {
+              return "$" + abbrNum(value, 2);
+            }
+          },
+          gridLines: {
+            lineWidth: 0
           },
           stacked: true
         },
@@ -282,7 +301,13 @@ function PrincipalInterestChart(props) {
           id: "2",
           position: "right",
           ticks: {
-            beginAtZero: true
+            beginAtZero: true,
+            callback: function(value, index, values) {
+              return value + "%";
+            }
+          },
+          gridLines: {
+            lineWidth: 0
           }
         }
       ]
