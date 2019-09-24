@@ -1,35 +1,25 @@
-import React from "react";
-import styled from "styled-components";
-import { Droppable, Draggable } from "react-beautiful-dnd";
-
-const Container = styled.div`
-  margin: 8px;
-  border: 1px solid lightgrey;
-  border-radius: 2px;
-  width: 150px;
-  flex-grow: 1;
-`;
+import React from 'react';
+import { Droppable, Draggable } from 'react-beautiful-dnd';
+import { Card } from 'antd'
 
 function Portfolio({ properties, type }) {
   return (
-    <Droppable droppableId={type} type={`property`}>
+    <Droppable droppableId={type} type={'property'}>
       {(provided, snapshot) => (
-        <div ref={provided.innerRef}>
+        <div style={{ minHeight: '100px' }} ref={provided.innerRef}>
           {properties.map((property, index) => (
-            <Draggable
-              key={property._id}
-              draggableId={property._id}
-              index={index}
-            >
+            <Draggable key={property._id} draggableId={property._id} index={index}>
               {(provided, snapshot) => (
                 <div>
-                  <Container
+                  <div
                     ref={provided.innerRef}
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
                   >
-                    {property.address}
-                  </Container>
+                    <Card title={property.address}>
+                      Some content
+                    </Card>
+                  </div>
                   {provided.placeholder}
                 </div>
               )}

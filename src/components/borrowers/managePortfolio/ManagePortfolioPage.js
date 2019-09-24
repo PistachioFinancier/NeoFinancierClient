@@ -1,19 +1,17 @@
-import React, { Fragment, useState, useEffect } from "react";
-import Suite from "./Suite";
-import styled from "styled-components";
-import { Droppable, Draggable, DragDropContext } from "react-beautiful-dnd";
-import { Button, Col, Row, Dropdown, Icon, Menu } from "antd";
-import axios from "axios";
+import React, { Fragment, useState, useEffect } from 'react';
+import Suite from './Suite';
+import styled from 'styled-components';
+import { Droppable, DragDropContext } from 'react-beautiful-dnd';
+import { Button, Col, Row, Dropdown, Icon, Menu, Typography  } from 'antd';
+import axios from 'axios';
 
-const Container = styled.div`
+const SuiteContainer = styled.div`
   margin: 8px;
+  padding: 10px;
   border: 1px solid lightgrey;
   border-radius: 2px;
-  width: 150px;
-  min-height: 50px;
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
+  width: 90%;
+  min-height: 250px;
 `;
 
 function ManagePortfolioPage() {
@@ -21,27 +19,34 @@ function ManagePortfolioPage() {
   const [selectedSuiteIndexLeft, setSelectedIndexSuiteLeft] = useState();
   const [selectedSuiteIndexRight, setSelectedIndexSuiteRight] = useState();
   const [dataForColumns, setDataForColumns] = useState(null);
-  // const [dataForLeftColumn, setSelectedDataForLeftColumn] = useState();
-  // const [dataForRightColumn, setSelectedDataForRightColumn] = useState();
+
+  const { Title } = Typography;
 
   useEffect(() => {
-    fetch("http://localhost:9090")
-      .then(res => res.json())
-      .then(res => setSuiteData(res[0]));
+    fetch('http://localhost:9090')
+      .then((res) => res.json())
+      .then((res) => setSuiteData(res[0]));
   }, []);
 
   useEffect(() => {
     suiteData &&
       setDataForColumns([
         suiteData.multiPortfolio[selectedSuiteIndexLeft] || {},
-        suiteData.multiPortfolio[selectedSuiteIndexRight] || {}
+        suiteData.multiPortfolio[selectedSuiteIndexRight] || {},
       ]);
   }, [selectedSuiteIndexLeft, selectedSuiteIndexRight]);
 
   const dropdownMenuOptionsLeft = suiteData && (
     <Menu onClick={({ key }) => setSelectedIndexSuiteLeft(key)}>
       {suiteData.multiPortfolio.map((suite, index) => {
-        return <Menu.Item key={index}>{suite.suiteName}</Menu.Item>;
+        return (
+          <Menu.Item
+            key={index}
+            disabled={Number(selectedSuiteIndexRight) === index ? true : false}
+          >
+            {suite.suiteName}
+          </Menu.Item>
+        );
       })}
     </Menu>
   );
@@ -49,7 +54,11 @@ function ManagePortfolioPage() {
   const dropdownMenuOptionsRight = suiteData && (
     <Menu onClick={({ key }) => setSelectedIndexSuiteRight(key)}>
       {suiteData.multiPortfolio.map((suite, index) => {
-        return <Menu.Item key={index}>{suite.suiteName}</Menu.Item>;
+        return (
+          <Menu.Item key={index} disabled={Number(selectedSuiteIndexLeft) === index ? true : false}>
+            {suite.suiteName}
+          </Menu.Item>
+        );
       })}
     </Menu>
   );
@@ -58,10 +67,7 @@ function ManagePortfolioPage() {
 
   function handleSave() {
     axios
-      .post(
-        `http://localhost:9090/${suiteData.companyName}`,
-        suiteData.multiPortfolio
-      )
+      .post(`http://localhost:9090/${suiteData.companyName}`, suiteData.multiPortfolio)
       .then(function(response) {
         console.log(response);
       })
@@ -78,40 +84,38 @@ function ManagePortfolioPage() {
       return;
     }
 
-    if (type === "property") {
-      const suiteIndexSource =
-        suiteData.multiPortfolio[0].portfolios.findIndex(
-          portfolio => portfolio._id === source.droppableId
-        ) >= 0
-          ? 0
-          : 1;
+    if (type === 'property') {
+      const suiteOfItemDragged = suiteData.multiPortfolio.find((suite) =>
+        suite.portfolios.some((portfolio) => portfolio._id === source.droppableId),
+      );
 
-      const suiteIndexDest =
-        suiteData.multiPortfolio[0].portfolios.findIndex(
-          portfolio => portfolio._id === destination.droppableId
-        ) >= 0
-          ? 0
-          : 1;
+      const suiteIndexSource = suiteData.multiPortfolio.findIndex(
+        (suite) => suite._id === suiteOfItemDragged._id,
+      );
+
+      const suiteOfDestination = suiteData.multiPortfolio.find((suite) =>
+        suite.portfolios.some((portfolio) => portfolio._id === destination.droppableId),
+      );
+
+      const suiteIndexDest = suiteData.multiPortfolio.findIndex(
+        (suite) => suite._id === suiteOfDestination._id,
+      );
 
       // case: property into same portfolio bucket
       if (source.droppableId === destination.droppableId) {
         const suiteIndexSource =
           suiteData.multiPortfolio[0].portfolios.findIndex(
-            portfolio => portfolio._id === source.droppableId
+            (portfolio) => portfolio._id === source.droppableId,
           ) >= 0
             ? 0
             : 1;
 
         const portfolioIndexSource = suiteData.multiPortfolio[
           suiteIndexSource
-        ].portfolios.findIndex(
-          portfolio => portfolio._id === source.droppableId
-        );
+        ].portfolios.findIndex((portfolio) => portfolio._id === source.droppableId);
 
         const arrayAtSource = [
-          ...suiteData.multiPortfolio[suiteIndexSource].portfolios[
-            portfolioIndexSource
-          ].properties
+          ...suiteData.multiPortfolio[suiteIndexSource].portfolios[portfolioIndexSource].properties,
         ];
 
         const draggedProperty = arrayAtSource.splice(source.index, 1);
@@ -119,7 +123,7 @@ function ManagePortfolioPage() {
         arrayAtSource.splice(destination.index, 0, draggedProperty[0]);
 
         const newState = {
-          ...suiteData
+          ...suiteData,
         };
 
         newState.multiPortfolio[suiteIndexSource].portfolios[
@@ -132,40 +136,29 @@ function ManagePortfolioPage() {
       }
 
       // case: property dropped into different portfolio within same suite
-      if (
-        source.droppableId !== destination.droppableId &&
-        suiteIndexSource === suiteIndexDest
-      ) {
+      if (source.droppableId !== destination.droppableId && suiteIndexSource === suiteIndexDest) {
         const portfolioIndexSource = suiteData.multiPortfolio[
           suiteIndexSource
-        ].portfolios.findIndex(
-          portfolio => portfolio._id === source.droppableId
-        );
+        ].portfolios.findIndex((portfolio) => portfolio._id === source.droppableId);
 
-        const portfolioIndexDest = suiteData.multiPortfolio[
-          suiteIndexSource
-        ].portfolios.findIndex(
-          portfolio => portfolio._id === destination.droppableId
+        const portfolioIndexDest = suiteData.multiPortfolio[suiteIndexSource].portfolios.findIndex(
+          (portfolio) => portfolio._id === destination.droppableId,
         );
 
         const arrayAtSource = [
-          ...suiteData.multiPortfolio[suiteIndexSource].portfolios[
-            portfolioIndexSource
-          ].properties
+          ...suiteData.multiPortfolio[suiteIndexSource].portfolios[portfolioIndexSource].properties,
         ];
 
         const draggedProperty = arrayAtSource.splice(source.index, 1);
 
         const arrayAtDest = [
-          ...suiteData.multiPortfolio[suiteIndexDest].portfolios[
-            portfolioIndexDest
-          ].properties
+          ...suiteData.multiPortfolio[suiteIndexDest].portfolios[portfolioIndexDest].properties,
         ];
 
         arrayAtDest.splice(destination.index, 0, draggedProperty[0]);
 
         const newState = {
-          ...suiteData
+          ...suiteData,
         };
 
         newState.multiPortfolio[suiteIndexSource].portfolios[
@@ -185,34 +178,26 @@ function ManagePortfolioPage() {
       if (suiteIndexSource !== suiteIndexDest) {
         const portfolioIndexSource = suiteData.multiPortfolio[
           suiteIndexSource
-        ].portfolios.findIndex(
-          portfolio => portfolio._id === source.droppableId
-        );
+        ].portfolios.findIndex((portfolio) => portfolio._id === source.droppableId);
 
-        const portfolioIndexDest = suiteData.multiPortfolio[
-          suiteIndexDest
-        ].portfolios.findIndex(
-          portfolio => portfolio._id === destination.droppableId
+        const portfolioIndexDest = suiteData.multiPortfolio[suiteIndexDest].portfolios.findIndex(
+          (portfolio) => portfolio._id === destination.droppableId,
         );
 
         const arrayAtSource = [
-          ...suiteData.multiPortfolio[suiteIndexSource].portfolios[
-            portfolioIndexSource
-          ].properties
+          ...suiteData.multiPortfolio[suiteIndexSource].portfolios[portfolioIndexSource].properties,
         ];
 
         const draggedProperty = arrayAtSource.splice(source.index, 1);
 
         const arrayAtDest = [
-          ...suiteData.multiPortfolio[suiteIndexDest].portfolios[
-            portfolioIndexDest
-          ].properties
+          ...suiteData.multiPortfolio[suiteIndexDest].portfolios[portfolioIndexDest].properties,
         ];
 
         arrayAtDest.splice(destination.index, 0, draggedProperty[0]);
 
         const newState = {
-          ...suiteData
+          ...suiteData,
         };
 
         newState.multiPortfolio[suiteIndexSource].portfolios[
@@ -229,20 +214,18 @@ function ManagePortfolioPage() {
       }
     }
 
-    if (type === "portfolio") {
+    if (type === 'portfolio') {
       const suiteIndexSource = suiteData.multiPortfolio.findIndex(
-        suite => suite._id === source.droppableId
+        (suite) => suite._id === source.droppableId,
       );
 
       const suiteIndexDest = suiteData.multiPortfolio.findIndex(
-        suite => suite._id === destination.droppableId
+        (suite) => suite._id === destination.droppableId,
       );
 
       // case: portfolio dropped into same suite
       if (suiteIndexSource === suiteIndexDest) {
-        const arrayAtSource = [
-          ...suiteData.multiPortfolio[suiteIndexSource].portfolios
-        ];
+        const arrayAtSource = [...suiteData.multiPortfolio[suiteIndexSource].portfolios];
 
         const draggedPortfolio = arrayAtSource.splice(source.index, 1);
 
@@ -259,20 +242,16 @@ function ManagePortfolioPage() {
 
       // case: portfolio dropped into different suite
       if (source.droppableId !== destination.droppableId) {
-        const arrayAtSource = [
-          ...suiteData.multiPortfolio[suiteIndexSource].portfolios
-        ];
+        const arrayAtSource = [...suiteData.multiPortfolio[suiteIndexSource].portfolios];
 
-        const arrayAtDest = [
-          ...suiteData.multiPortfolio[suiteIndexDest].portfolios
-        ];
+        const arrayAtDest = [...suiteData.multiPortfolio[suiteIndexDest].portfolios];
 
         const draggedPortfolio = arrayAtSource.splice(source.index, 1);
 
         arrayAtDest.splice(destination.index, 0, draggedPortfolio[0]);
 
         const newState = {
-          ...suiteData
+          ...suiteData,
         };
 
         newState.multiPortfolio[suiteIndexSource].portfolios = arrayAtSource;
@@ -280,6 +259,8 @@ function ManagePortfolioPage() {
         newState.multiPortfolio[suiteIndexDest].portfolios = arrayAtDest;
 
         setSuiteData(newState);
+
+        return;
       }
     }
   }
@@ -287,121 +268,75 @@ function ManagePortfolioPage() {
   return (
     <Fragment>
       <Row>
-        <Col span={12}>
+        <Col span={11}>
           <Dropdown overlay={dropdownMenuOptionsLeft}>
             <a className="ant-dropdown-link">
               {suiteData
                 ? selectedSuiteIndexLeft
                   ? suiteData.multiPortfolio[selectedSuiteIndexLeft].suiteName
-                  : "Select Suite"
-                : "Select Suite"}
+                  : 'Select Suite'
+                : 'Select Suite'}
               <Icon type="down" />
             </a>
           </Dropdown>
         </Col>
-        <Col span={12}>
+        <Col span={11}>
           <Dropdown overlay={dropdownMenuOptionsRight}>
             <a className="ant-dropdown-link">
               {suiteData
                 ? selectedSuiteIndexRight
                   ? suiteData.multiPortfolio[selectedSuiteIndexRight].suiteName
-                  : "Select Suite"
-                : "Select Suite"}
+                  : 'Select Suite'
+                : 'Select Suite'}
               <Icon type="down" />
             </a>
           </Dropdown>
         </Col>
       </Row>
-      {dataForColumns && (
-        <DragDropContext onDragEnd={onDragEnd}>
-          <Row>
-            <Droppable droppableId="droppable" type="Suite">
-              {(provided, snapshot) => (
-                <div ref={provided.innerRef}>
-                  <Col span={12}>
-                    <Draggable
-                      key={dataForColumns[0]._id}
-                      draggableId={dataForColumns[0]._id}
-                      index={0}
-                    >
-                      {(provided, snapshot) => (
-                        <div>
-                          <Container
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                          >
-                            {dataForColumns[0].suiteName}
-                            <Suite
-                              suite={dataForColumns[0].portfolios}
-                              type={dataForColumns[0]._id}
-                            />
-                          </Container>
-                          {provided.placeholder}
-                        </div>
+      <Row>
+        <DragDropContext onDragEnd={(e) => onDragEnd(e)}>
+          <Col span={11}>
+            {dataForColumns && dataForColumns[0] && (
+              <SuiteContainer>
+                <Droppable
+                  droppableId={suiteData.multiPortfolio[selectedSuiteIndexLeft || 0]._id}
+                  type="portfolio"
+                  direction="horizontal"
+                >
+                  {(provided, snapshot) => (
+                    <div style={{ minWidth: '200px', minHeight: '100px' }} ref={provided.innerRef}>
+                      <Title level={2}>{dataForColumns[0].suiteName}</Title>
+                      {dataForColumns && dataForColumns[0] && (
+                        <Suite suite={dataForColumns[0]}></Suite>
                       )}
-                    </Draggable>
-                  </Col>
-                  <Col span={12}>
-                    {dataForColumns[1] && (
-                      <Draggable
-                        key={dataForColumns[1]._id}
-                        draggableId={dataForColumns[1]._id}
-                        index={1}
-                      >
-                        {(provided, snapshot) => (
-                          <div>
-                            <Container
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                            >
-                              {dataForColumns[1].suiteName}
-                              <Suite
-                                suite={dataForColumns[1].portfolios}
-                                type={dataForColumns[1]._id}
-                              />
-                            </Container>
-                            {provided.placeholder}
-                          </div>
-                        )}
-                      </Draggable>
-                    )}
-                  </Col>
-
-                  {/* {dataForColumns.map((suite, index) => (
-                    <Col span={12} key={index}>
-                      <Draggable
-                        key={suite._id}
-                        draggableId={suite._id}
-                        index={index}
-                      >
-                        {(provided, snapshot) => (
-                          <div>
-                            <Container
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                            >
-                              {suite.suiteName}
-                              <Suite
-                                suite={suite.portfolios}
-                                type={suite._id}
-                              />
-                            </Container>
-                            {provided.placeholder}
-                          </div>
-                        )}
-                      </Draggable>
-                    </Col>
-                  ))} */}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
-          </Row>
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              </SuiteContainer>
+            )}
+          </Col>
+          <Col span={11}>
+            {dataForColumns && dataForColumns[1] && (
+              <SuiteContainer>
+                <Droppable
+                  droppableId={suiteData.multiPortfolio[selectedSuiteIndexRight || 1]._id}
+                  type="portfolio"
+                  direction="horizontal"
+                >
+                  {(provided, snapshot) => (
+                    <div style={{ minWidth: '200px', minHeight: '100px' }} ref={provided.innerRef}>
+                      <Title level={2}>{dataForColumns[1].suiteName}</Title>
+                      <Suite suite={dataForColumns[1]}></Suite>
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              </SuiteContainer>
+            )}
+          </Col>
         </DragDropContext>
-      )}
+      </Row>
       <Button onClick={handleCancel}>Cancel</Button>
       <Button onClick={handleSave}>Save</Button>
     </Fragment>

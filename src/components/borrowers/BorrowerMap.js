@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from "react";
-import { Map, Marker, GoogleApiWrapper, InfoWindow } from "google-maps-react";
-import Geocode from "react-geocode";
+import React, { useState, useEffect } from 'react';
+import { Map, Marker, GoogleApiWrapper, InfoWindow } from 'google-maps-react';
+import Geocode from 'react-geocode';
 
-const apiKey = "AIzaSyC3fatvZECW_8oamH3dFXefvaZ1ro2diXU";
+const apiKey = 'AIzaSyC3fatvZECW_8oamH3dFXefvaZ1ro2diXU';
 
 Geocode.setApiKey(apiKey);
 
 function LenderMap(props) {
   const [places, setPlaces] = useState([
     {
-      title: "Toronto",
-      name: "Toronto",
-      address: "301 Front St W, Toronto",
+      title: 'Toronto',
+      name: 'Toronto',
+      address: '301 Front St W, Toronto',
       coordinates: { lat: 43.642567, lng: -79.387054 }
     }
   ]);
@@ -21,9 +21,9 @@ function LenderMap(props) {
   const [showInfoWindow, setShowInfoWindow] = useState(false);
 
   const mapStyles = {
-    width: "70%",
-    height: "70%",
-    position: "relative"
+    width: '70%',
+    height: '70%',
+    position: 'relative'
   };
 
   useEffect(() => {
@@ -53,7 +53,7 @@ function LenderMap(props) {
             resolve({ ...place, coordinates: { lat, lng } });
           },
           error => {
-            console.log(place.address + " has failed");
+            console.log(place.address + ' has failed');
             resolve(null); // Even if we fail, we still want to display the rest of the locations
           }
         );
@@ -80,8 +80,8 @@ function LenderMap(props) {
 
   const selectedPlaceInfo = showInfoWindow ? (
     <div>
-      <h1 style={{ textAlign: "center" }}>{selectedPlace.name}</h1>
-      <h4 style={{ textAlign: "center" }}>
+      <h1 style={{ textAlign: 'center' }}>{selectedPlace.name}</h1>
+      <h4 style={{ textAlign: 'center' }}>
         {selectedPlace.clientPlace.address}
       </h4>
       <table>
@@ -90,17 +90,17 @@ function LenderMap(props) {
             <div>
               <img
                 src={
-                  "https://maps.googleapis.com/maps/api/streetview?location=" +
+                  'https://maps.googleapis.com/maps/api/streetview?location=' +
                   activeMarker.clientPlace.address +
-                  "&size=175x175&key=" +
+                  '&size=175x175&key=' +
                   apiKey
                 }
-                alt={"Image of " + selectedPlace.name}
+                alt={'Image of ' + selectedPlace.name}
               />
             </div>
           </td>
           <td>
-            <div style={{ marginLeft: "10px", marginTop: "10px" }}>
+            <div style={{ marginLeft: '10px', marginTop: '10px' }}>
               <h4>Value:</h4>
               <p>{activeMarker.clientPlace.value}</p>
               <br />

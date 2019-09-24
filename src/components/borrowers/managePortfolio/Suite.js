@@ -1,57 +1,45 @@
-import React, { Fragment } from "react";
-import { Droppable, Draggable } from "react-beautiful-dnd";
-import Portfolio from "./Portfolio";
-import styled from "styled-components";
+import React, { Fragment } from 'react';
+import { Draggable } from 'react-beautiful-dnd';
+import Portfolio from './Portfolio';
+import styled from 'styled-components';
+import { Typography } from 'antd'
 
-const Container = styled.div`
+const PortfolioContainer = styled.div`
   margin: 8px;
-  border: 1px solid lightgrey;
+  border: 1px solid lightblue;
   border-radius: 2px;
-  width: 150px;
-  min-height: 50px;
+  width: 200px;
+  padding: 10px;
+  min-height: 150px;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
 `;
 
-function Suites({ suite, type }) {
+function Suite({ suite }) {
+  const { Title } = Typography 
   return (
     <Fragment>
-      {suite && (
-        <Droppable droppableId={type} type="portfolio">
-          {(provided, snapshot) => (
-            <div ref={provided.innerRef}>
-              {suite.map((portfolio, index) => (
-                <Draggable
-                  key={portfolio._id}
-                  draggableId={portfolio._id}
-                  index={index}
+      {suite.portfolios &&
+        suite.portfolios.map((portfolio, index) => (
+          <Draggable key={portfolio._id} draggableId={portfolio._id} index={index}>
+            {(provided, snapshot) => (
+              <div>
+                <PortfolioContainer
+                  ref={provided.innerRef}
+                  {...provided.draggableProps}
+                  {...provided.dragHandleProps}
                 >
-                  {(provided, snapshot) => (
-                    <div>
-                      <Container
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                      >
-                        {portfolio.portfolioName}
-                        <Portfolio
-                          properties={portfolio.properties}
-                          type={portfolio._id}
-                        />
-                      </Container>
-                      {provided.placeholder}
-                    </div>
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-      )}
+                  <Title level={3}>{portfolio.portfolioName}</Title>
+                  <Portfolio properties={portfolio.properties} type={portfolio._id} />
+                </PortfolioContainer>
+                {provided.placeholder}
+              </div>
+            )}
+          </Draggable>
+        ))}
     </Fragment>
   );
 }
 
-export default Suites;
+export default Suite;
